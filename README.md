@@ -7,7 +7,7 @@ This implementation includes **distributed** and **fp16** support
 and uses the [LJSpeech dataset](https://keithito.com/LJ-Speech-Dataset/).
 
 Distributed and FP16 support relies on work by Christian Sarofeen and NVIDIA's
-frameworks team.
+[Apex Library](https://github.com/nvidia/apex).
 
 ![Alignment, Predicted Mel Spectrogram, Target Mel Spectrogram](tensorboard.png)
 

@@ -43,7 +43,7 @@ wavenet inference
 
 ## Acknowledgements
 This implementation is inspired or uses code from the following repos:
-[Ryuchi Yamamoto](github.com/r9y9/tacotron_pytorch), [Keith
+[Ryuchi Yamamoto](https://github.com/r9y9/tacotron_pytorch), [Keith
 Ito](https://github.com/keithito/tacotron/), [Prem Seetharaman](https://github.com/pseeth/pytorch-stft). 
 
 We are thankful to the Tacotron 2 paper authors, specially Jonathan Shen,

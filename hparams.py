@@ -23,8 +23,8 @@ def create_hparams(hparams_string=None, verbose=False):
         ################################
         # Data Parameters             #
         ################################
-        training_files='ljs_audio_text_train_filelist.txt',
-        validation_files='ljs_audio_text_val_filelist.txt',
+        training_files='filelists/ljs_audio_text_train_filelist.txt',
+        validation_files='filelists/ljs_audio_text_val_filelist.txt',
         text_cleaners=['english_cleaners'],
         sort_by_length=False,
 

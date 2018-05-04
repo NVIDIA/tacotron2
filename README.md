@@ -21,10 +21,10 @@ Distributed and FP16 support relies on work by Christian Sarofeen and NVIDIA's
 3. CD into this repo: `cd tacotron2`
 4. Update .wav paths: `sed -i -- 's,DUMMY,ljs_dataset_folder/wavs,g' filelists/*.txt`
 5. Install [pytorch 0.4](https://github.com/pytorch/pytorch)
-6. Install python requirements or use docker container (tbd)
+6. Install python requirements or build docker image 
     - Install python requirements: `pip install requirements.txt`
     - **OR**
-    - Docker container `(tbd)` 
+    - Build docker image: `docker build --tag tacotron2 .` 
 
 ## Training
 1. `python train.py --output_directory=outdir --log_directory=logdir`

@@ -132,7 +132,7 @@ def validate(model, criterion, valset, iteration, batch_size, n_gpus,
             batch_parser = model.module.parse_batch
         else:
             batch_parser = model.parse_batch
-            
+
         for i, batch in enumerate(val_loader):
             x, y = batch_parser(batch)
             y_pred = model(x)
@@ -161,7 +161,6 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
     """
     if hparams.distributed_run:
         init_distributed(hparams, n_gpus, rank, group_name)
-
 
     torch.manual_seed(hparams.seed)
     torch.cuda.manual_seed(hparams.seed)

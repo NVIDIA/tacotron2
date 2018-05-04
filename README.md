@@ -19,7 +19,7 @@ Distributed and FP16 support relies on work by Christian Sarofeen and NVIDIA's
 1. Download and extract the [LJ Speech dataset](https://keithito.com/LJ-Speech-Dataset/)
 2. Clone this repo: `git clone https://github.com/NVIDIA/tacotron2.git`
 3. CD into this repo: `cd tacotron2`
-4. Update .wav paths: `sed -i -- 's,DUMMY,ljs_dataset_folder/wavs,g' *.txt`
+4. Update .wav paths: `sed -i -- 's,DUMMY,ljs_dataset_folder/wavs,g' filelists/*.txt`
 5. Install [pytorch 0.4](https://github.com/pytorch/pytorch)
 6. Install python requirements or use docker container (tbd)
     - Install python requirements: `pip install requirements.txt`
@@ -42,11 +42,14 @@ Distributed and FP16 support relies on work by Christian Sarofeen and NVIDIA's
 wavenet inference
 
 ## Acknowledgements
-This implementation is inspired or uses code from the following repos:
-[Ryuchi Yamamoto](https://github.com/r9y9/tacotron_pytorch), [Keith
-Ito](https://github.com/keithito/tacotron/), [Prem Seetharaman](https://github.com/pseeth/pytorch-stft). 
+This implementation uses code from the following repos: [Keith
+Ito](https://github.com/keithito/tacotron/), [Prem
+Seetharaman](https://github.com/pseeth/pytorch-stft) as described in our code.
 
-We are thankful to the Tacotron 2 paper authors, specially Jonathan Shen,
-Yuxuan Wang and Zongheng Yang.
+We are inspired by [Ryuchi Yamamoto's](https://github.com/r9y9/tacotron_pytorch)
+Tacotron PyTorch implementation.
+
+We are thankful to the Tacotron 2 paper authors, specially Jonathan Shen, Yuxuan
+Wang and Zongheng Yang.
 
 

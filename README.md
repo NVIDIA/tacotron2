@@ -31,7 +31,7 @@ Distributed and FP16 support relies on work by Christian Sarofeen and NVIDIA's
 2. (OPTIONAL) `tensorboard --logdir=outdir/logdir`
 
 ## Multi-GPU (distributed) and FP16 Training
-1. `python -m multiproc train.py --output_directory=/outdir --log_directory=/logdir --hparams=distributed_run=True`
+1. `python -m multiproc train.py --output_directory=/outdir --log_directory=/logdir --hparams=distributed_run=True --fp16_run=True`
 
 ## Inference
 1. `jupyter notebook --ip=127.0.0.1 --port=31337`

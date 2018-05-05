@@ -29,6 +29,7 @@ Distributed and FP16 support relies on work by Christian Sarofeen and NVIDIA's
 ## Training
 1. `python train.py --output_directory=outdir --log_directory=logdir`
 2. (OPTIONAL) `tensorboard --logdir=outdir/logdir`
+3. (OPTIONAL) Reduce batch size in hparms.py if you encounter CUDA out-of-memory error.
 
 ## Multi-GPU (distributed) and FP16 Training
 1. `python -m multiproc train.py --output_directory=outdir --log_directory=logdir --hparams=distributed_run=True,fp16_run=True`

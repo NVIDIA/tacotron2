@@ -22,13 +22,14 @@ Distributed and FP16 support relies on work by Christian Sarofeen and NVIDIA's
 4. Update .wav paths: `sed -i -- 's,DUMMY,ljs_dataset_folder/wavs,g' filelists/*.txt`
 5. Install [pytorch 0.4](https://github.com/pytorch/pytorch)
 6. Install python requirements or build docker image 
-    - Install python requirements: `pip install requirements.txt`
+    - Install python requirements: `pip install -r requirements.txt`
     - **OR**
     - Build docker image: `docker build --tag tacotron2 .` 
 
 ## Training
 1. `python train.py --output_directory=outdir --log_directory=logdir`
 2. (OPTIONAL) `tensorboard --logdir=outdir/logdir`
+3. (OPTIONAL) Reduce batch size in hparms.py if you encounter CUDA out-of-memory error.
 
 ## Multi-GPU (distributed) and FP16 Training
 1. `python -m multiproc train.py --output_directory=outdir --log_directory=logdir --hparams=distributed_run=True,fp16_run=True`

@@ -20,6 +20,7 @@ Distributed and FP16 support relies on work by Christian Sarofeen and NVIDIA's
 2. Clone this repo: `git clone https://github.com/NVIDIA/tacotron2.git`
 3. CD into this repo: `cd tacotron2`
 4. Update .wav paths: `sed -i -- 's,DUMMY,ljs_dataset_folder/wavs,g' filelists/*.txt`
+    - Alternatively, set `load_mel_from_disk=True` in `hparams.py` and update mel-spectrogram paths 
 5. Install [pytorch 0.4](https://github.com/pytorch/pytorch)
 6. Install python requirements or build docker image 
     - Install python requirements: `pip install -r requirements.txt`

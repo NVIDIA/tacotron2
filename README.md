@@ -11,6 +11,9 @@ Distributed and FP16 support relies on work by Christian Sarofeen and NVIDIA's
 
 ![Alignment, Predicted Mel Spectrogram, Target Mel Spectrogram](tensorboard.png)
 
+[Demo audio](https://github.com/NVIDIA/tacotron2/blob/master/demo.wav) using Ryuchi Yamamoto's [pre-trained Mixture of Logistics
+wavenet](https://github.com/r9y9/wavenet_vocoder/)  
+"Scientists at the CERN laboratory say they have discovered a new particle."
 
 ## Pre-requisites
 1. NVIDIA GPU + CUDA cuDNN

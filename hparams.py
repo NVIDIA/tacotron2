@@ -75,6 +75,7 @@ def create_hparams(hparams_string=None, verbose=False):
         ################################
         # Optimization Hyperparameters #
         ################################
+        used_saved_learning_rate=False,
         learning_rate=1e-3,
         weight_decay=1e-6,
         grad_clip_thresh=1,

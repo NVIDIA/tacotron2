@@ -35,7 +35,7 @@ wavenet](https://github.com/r9y9/wavenet_vocoder/)
 2. (OPTIONAL) `tensorboard --logdir=outdir/logdir`
 
 ## Multi-GPU (distributed) and FP16 Training
-1. `python -m multiproc train.py --output_directory=outdir --log_directory=logdir --hparams=distributed_run=True,fp16_run=True`
+1. `python -m multiproc train.py --output_directory=outdir --log_directory=logdir --hparams=distributed_run=1,fp16_run=1`
 
 ## Inference
 When performing Mel-Spectrogram to Audio synthesis with a WaveNet model, make sure Tacotron 2 and WaveNet were trained on the same mel-spectrogram representation. Follow these steps to use a a simple inference pipeline using griffin-lim:

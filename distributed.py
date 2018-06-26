@@ -2,6 +2,7 @@ import torch
 import torch.distributed as dist
 from torch.nn.modules import Module
 
+
 def _flatten_dense_tensors(tensors):
     """Flatten dense tensors into a contiguous 1D buffer. Assume tensors are of
     same dense type.
@@ -17,6 +18,7 @@ def _flatten_dense_tensors(tensors):
         return tensors[0].contiguous().view(-1)
     flat = torch.cat([t.contiguous().view(-1) for t in tensors], dim=0)
     return flat
+
 
 def _unflatten_dense_tensors(flat, tensors):
     """View a flat buffer using the sizes of tensors. Assume that tensors are of
@@ -47,11 +49,13 @@ used to set the device.
 Parameters are broadcasted to the other processes on initialization of DistributedDataParallel,
 and will be allreduced at the finish of the backward pass.
 '''
+
+
 class DistributedDataParallel(Module):
 
     def __init__(self, module):
         super(DistributedDataParallel, self).__init__()
-        #fallback for PyTorch 0.3
+        # fallback for PyTorch 0.3
         if not hasattr(dist, '_backend'):
             self.warn_on_half = True
         else:
@@ -65,7 +69,7 @@ class DistributedDataParallel(Module):
             dist.broadcast(p, 0)
 
         def allreduce_params():
-            if(self.needs_reduction):
+            if (self.needs_reduction):
                 self.needs_reduction = False
                 buckets = {}
                 for param in self.module.parameters():
@@ -93,6 +97,7 @@ class DistributedDataParallel(Module):
         for param in list(self.module.parameters()):
             def allreduce_hook(*unused):
                 param._execution_engine.queue_callback(allreduce_params)
+
             if param.requires_grad:
                 param.register_hook(allreduce_hook)
 

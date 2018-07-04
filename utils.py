@@ -11,7 +11,10 @@ def get_mask_from_lengths(lengths):
 
 
 def load_wav_to_torch(full_path, sr):
-    sampling_rate, data = read(full_path)
+    try:
+        sampling_rate, data = read(full_path)
+    except Exception as e:
+        print(full_path)
     assert sr == sampling_rate, "{} SR doesn't match {} on path {}".format(
         sr, sampling_rate, full_path)
     return torch.FloatTensor(data.astype(np.float32))

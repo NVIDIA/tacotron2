@@ -26,7 +26,7 @@ hparams.filter_length = 1024
 hparams.hop_length = 256
 hparams.win_length = 1024
 
-checkpoint_path = "/home/scratch.adlr-gcf/audio_denoising/runs/TTS-Tacotron2-LJS-MSE-DRC-NoMaskPadding-Unsorted-Distributed-22khz/checkpoint_15500"
+checkpoint_path = "/home/hwak1234/projects/tacotron2/outdir/checkpoint_15000"
 model = load_model(hparams)
 try:
     model = model.module

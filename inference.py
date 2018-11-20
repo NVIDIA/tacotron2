@@ -61,7 +61,7 @@ spec_from_mel = spec_from_mel * spec_from_mel_scaling
 waveform = griffin_lim(torch.autograd.Variable(spec_from_mel[:, :, :-1]),
                        taco_stft.stft_fn, 60)
 dec_time = time.time() - stime
-print(len(waveform), hparams.sampling_rate)
-len_audio = float(len(waveform))/float(hparams.sampling_rate)
+print(len(waveform[0].data.cpu().numpy()), hparams.sampling_rate)
+len_audio = float(len(waveform[0].data.cpu().numpy()))/float(hparams.sampling_rate)
 str = "audio length: {:.2f} sec\ninference time: {:.2f} sec\ndecoding time: {:.2f}".format(len_audio, inf_time, dec_time)
 print(str)

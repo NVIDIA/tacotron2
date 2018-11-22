@@ -1,16 +1,24 @@
 """ from https://github.com/keithito/tacotron """
 import re
 from text import cleaners
-from text.symbols import symbols
+from text.symbols import eng_symbols, kor_symbols
+from hparams import create_hparams
 
+hparam = create_hparams()
+cleaner_names = hparam.cleaner_names[0]
 
 # Mappings from symbol to numeric ID and vice versa:
+symbols = ""
+_symbol_to_id = {}
+_id_to_symbol = {}
+if cleaner_names == "english_cleaners": symbols = eng_symbols
+if cleaner_names == "korean_cleaners": symbols = kor_symbols
+
 _symbol_to_id = {s: i for i, s in enumerate(symbols)}
 _id_to_symbol = {i: s for i, s in enumerate(symbols)}
 
 # Regular expression matching text enclosed in curly braces:
 _curly_re = re.compile(r'(.*?)\{(.+?)\}(.*)')
-
 
 def text_to_sequence(text, cleaner_names):
   '''Converts a string of text to a sequence of IDs corresponding to the symbols in the text.
@@ -74,3 +82,6 @@ def _arpabet_to_sequence(text):
 
 def _should_keep_symbol(s):
   return s in _symbol_to_id and s is not '_' and s is not '~'
+
+if __name__ == "__main__":
+  print(text_to_sequence('this is test sentence.', ['english_cleaners']))

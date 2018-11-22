@@ -5,7 +5,7 @@ from text.symbols import eng_symbols, kor_symbols
 from hparams import create_hparams
 
 hparam = create_hparams()
-cleaner_names = hparam.cleaner_names[0]
+cleaner_names = hparam.text_cleaners[0]
 
 # Mappings from symbol to numeric ID and vice versa:
 symbols = ""

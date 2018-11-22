@@ -5,20 +5,30 @@ from text.symbols import eng_symbols, kor_symbols
 from hparams import create_hparams
 
 hparam = create_hparams()
-cleaner_names = hparam.text_cleaners[0]
+cleaner_names = hparam.text_cleaners
 
 # Mappings from symbol to numeric ID and vice versa:
 symbols = ""
 _symbol_to_id = {}
 _id_to_symbol = {}
-if cleaner_names == "english_cleaners": symbols = eng_symbols
-if cleaner_names == "korean_cleaners": symbols = kor_symbols
+if cleaner_names == ["english_cleaners"]: symbols = eng_symbols
+if cleaner_names == ["korean_cleaners"]: symbols = kor_symbols
 
 _symbol_to_id = {s: i for i, s in enumerate(symbols)}
 _id_to_symbol = {i: s for i, s in enumerate(symbols)}
 
 # Regular expression matching text enclosed in curly braces:
 _curly_re = re.compile(r'(.*?)\{(.+?)\}(.*)')
+
+def change_symbol(cleaner_names):
+  symbols = ""
+  global _symbol_to_id
+  global _id_to_symbol
+  if cleaner_names == ["english_cleaners"]: symbols = eng_symbols
+  if cleaner_names == ["korean_cleaners"]: symbols = kor_symbols
+
+  _symbol_to_id = {s: i for i, s in enumerate(symbols)}
+  _id_to_symbol = {i: s for i, s in enumerate(symbols)}
 
 def text_to_sequence(text, cleaner_names):
   '''Converts a string of text to a sequence of IDs corresponding to the symbols in the text.
@@ -34,7 +44,7 @@ def text_to_sequence(text, cleaner_names):
       List of integers corresponding to the symbols in the text
   '''
   sequence = []
-
+  change_symbol(cleaner_names)
   # Check for curly braces and treat their contents as ARPAbet:
   while len(text):
     m = _curly_re.match(text)

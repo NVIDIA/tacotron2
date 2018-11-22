@@ -84,4 +84,5 @@ def _should_keep_symbol(s):
   return s in _symbol_to_id and s is not '_' and s is not '~'
 
 if __name__ == "__main__":
-  print(text_to_sequence('this is test sentence.', ['english_cleaners']))
+  print(text_to_sequence('this is test sentence.? ', ['english_cleaners']))
+  print(text_to_sequence('테스트 문장입니다.? ', ['korean_cleaners']))

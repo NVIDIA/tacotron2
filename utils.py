@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.io.wavfile import read
+from scipy import signal
 import torch
 
 
@@ -12,6 +13,9 @@ def get_mask_from_lengths(lengths):
 
 def load_wav_to_torch(full_path, sr):
     sampling_rate, data = read(full_path)
+    if sr != sampling_rate:
+        data = signal.resample(data, sr)
+        sampling_rate = sr
     assert sr == sampling_rate, "{} SR doesn't match {} on path {}".format(
         sr, sampling_rate, full_path)
     return torch.FloatTensor(data.astype(np.float32))

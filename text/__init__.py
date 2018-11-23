@@ -98,3 +98,4 @@ if __name__ == "__main__":
   print(text_to_sequence('테스트 문장입니다.? ', ['korean_cleaners']))
   print(_clean_text('AB테스트 문장입니다.? ', ['korean_cleaners']))
   print(_clean_text('mp3 파일을 홈페이지에서 다운로드 받으시기 바랍니다.',['korean_cleaners']))
+  print(_clean_text("마가렛 대처의 별명은 '철의 여인'이었다.", ['korean_cleaners']))

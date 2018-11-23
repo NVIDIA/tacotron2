@@ -100,3 +100,6 @@ if __name__ == "__main__":
   print(_clean_text('mp3 파일을 홈페이지에서 다운로드 받으시기 바랍니다.',['korean_cleaners']))
   print(_clean_text("마가렛 대처의 별명은 '철의 여인'이었다.", ['korean_cleaners']))
   print(_clean_text("제 전화번호는 01012345678이에요.", ['korean_cleaners']))
+  print(_clean_text("‘아줌마’는 결혼한 여자를 뜻한다.", ['korean_cleaners']))
+  print(text_to_sequence("‘아줌마’는 결혼한 여자를 뜻한다.", ['korean_cleaners']))
+

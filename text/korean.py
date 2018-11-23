@@ -232,10 +232,11 @@ def tokenizer_fn(iterator, symbol_type):
 def normalize(text):
     text = text.strip()
 
+    text = text.replace("'", "")
+    text = text.replace('"', "")
+
     text = re.sub('\(\d+일\)', '', text)
     text = re.sub('\([⺀-⺙⺛-⻳⼀-⿕々〇〡-〩〸-〺〻㐀-䶵一-鿃豈-鶴侮-頻並-龎]+\)', '', text)
-    text = text.replace("'","")
-    text = text.replace('"', "")
 
     text = normalize_with_dictionary(text, etc_dictionary)
     text = normalize_english(text)

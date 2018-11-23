@@ -4,6 +4,7 @@ etc_dictionary = {
         '20, 30대': '이십대 삼십대',
         '1+1': '원플러스원',
         '3에서 6개월인': '3개월에서 육개월인',
+        'mp3': '엠피쓰리',
 }
 
 english_dictionary = {
@@ -11,7 +12,6 @@ english_dictionary = {
         'track': '트랙',
 
         # krbook
-        'mp3': '엠피쓰리',
         'LA': '엘에이',
         'LG': '엘지',
         'KOREA': '코리아',

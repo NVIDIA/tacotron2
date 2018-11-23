@@ -324,7 +324,10 @@ def number_to_korean(num_str, is_count=False):
         num_str, unit_str = num_str.group(), ""
     
     num_str = num_str.replace(',', '')
-    num = ast.literal_eval(num_str)
+    try:
+        num = ast.literal_eval(num_str)
+    except:
+        num = int(num_str)
 
     if num == 0:
         return "영"

@@ -11,11 +11,6 @@ cleaner_names = hparam.text_cleaners
 symbols = ""
 _symbol_to_id = {}
 _id_to_symbol = {}
-if cleaner_names == ["english_cleaners"]: symbols = eng_symbols
-if cleaner_names == ["korean_cleaners"]: symbols = kor_symbols
-
-_symbol_to_id = {s: i for i, s in enumerate(symbols)}
-_id_to_symbol = {i: s for i, s in enumerate(symbols)}
 
 # Regular expression matching text enclosed in curly braces:
 _curly_re = re.compile(r'(.*?)\{(.+?)\}(.*)')
@@ -29,6 +24,8 @@ def change_symbol(cleaner_names):
 
   _symbol_to_id = {s: i for i, s in enumerate(symbols)}
   _id_to_symbol = {i: s for i, s in enumerate(symbols)}
+
+change_symbol(cleaner_names)
 
 def text_to_sequence(text, cleaner_names):
   '''Converts a string of text to a sequence of IDs corresponding to the symbols in the text.
@@ -96,3 +93,4 @@ def _should_keep_symbol(s):
 if __name__ == "__main__":
   print(text_to_sequence('this is test sentence.? ', ['english_cleaners']))
   print(text_to_sequence('테스트 문장입니다.? ', ['korean_cleaners']))
+  print(_clean_text('AB테스트 문장입니다.? ', ['korean_cleaners']))

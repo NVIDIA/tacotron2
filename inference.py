@@ -13,6 +13,7 @@ from layers import TacotronSTFT
 from audio_processing import griffin_lim
 from train import load_model
 from text import text_to_sequence
+from scipy.io.wavfile import write
 
 def plot_data(data, figsize=(16, 4)):
     fig, axes = plt.subplots(1, len(data), figsize=figsize)
@@ -26,7 +27,8 @@ hparams.filter_length = 1024
 hparams.hop_length = 256
 hparams.win_length = 1024
 
-checkpoint_path = "/home/hwak1234/projects/tacotron2/outdir/checkpoint_15000"
+#checkpoint_path = "/home/hwak1234/projects/tacotron2/outdir/checkpoint_15000"
+checkpoint_path = "/home/hwak1234/projects/tacotron2/nam_h_out/checkpoint_127000"
 model = load_model(hparams)
 try:
     model = model.module
@@ -35,8 +37,10 @@ except:
 model.load_state_dict({k.replace('module.',''):v for k,v in torch.load(checkpoint_path)['state_dict'].items()})
 _ = model.eval()
 
-text = "This is an example of text to speech synthesis after 14 hours training."
-sequence = np.array(text_to_sequence(text, ['english_cleaners']))[None, :]
+# text = "This is an example of text to speech synthesis after 14 hours training."
+# sequence = np.array(text_to_sequence(text, ['english_cleaners']))[None, :]
+text = "이 문장은 3일간 학습한 결과입니다."
+sequence = np.array(text_to_sequence(text, ['korean_cleaners']))[None, :]
 sequence = torch.autograd.Variable(
     torch.from_numpy(sequence)).cuda().long()
 
@@ -60,8 +64,13 @@ spec_from_mel = spec_from_mel * spec_from_mel_scaling
 
 waveform = griffin_lim(torch.autograd.Variable(spec_from_mel[:, :, :-1]),
                        taco_stft.stft_fn, 60)
+waveform = waveform[0].data.cpu().numpy().astype('int16')
+
 dec_time = time.time() - stime
-len_audio = float(len(waveform[0].data.cpu().numpy()))/float(hparams.sampling_rate)
-print(len(waveform[0].data.cpu().numpy()), hparams.sampling_rate)
+len_audio = float(len(waveform))/float(hparams.sampling_rate)
 str = "audio length: {:.2f} sec,  inference time: {:.2f} sec,  decoding time: {:.2f}".format(len_audio, inf_time, dec_time)
+
+print(len(waveform), hparams.sampling_rate)
 print(str)
+
+write("temp.wav", hparams.sampling_rate, waveform)

@@ -63,7 +63,7 @@ class TextMelLoader(torch.utils.data.Dataset):
         return len(self.audiopaths_and_text)
 
 
-class TextMelCollate():
+class TextMelCollate:
     """ Zero-pads model inputs and targets based on number of frames per setep
     """
     def __init__(self, n_frames_per_step):

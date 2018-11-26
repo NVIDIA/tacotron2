@@ -65,7 +65,7 @@ class DistributedDataParallel(Module):
             dist.broadcast(p, 0)
 
         def allreduce_params():
-            if(self.needs_reduction):
+            if self.needs_reduction:
                 self.needs_reduction = False
                 buckets = {}
                 for param in self.module.parameters():

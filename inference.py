@@ -40,7 +40,7 @@ _ = model.eval()
 
 # text = "This is an example of text to speech synthesis after 14 hours training."
 # sequence = np.array(text_to_sequence(text, ['english_cleaners']))[None, :]
-text = "이 문장은 3일간 학습한 결과입니다."
+text = "테스트 문장 입니다."
 sequence = np.array(text_to_sequence(text, ['korean_cleaners']))[None, :]
 sequence = torch.autograd.Variable(
     torch.from_numpy(sequence)).cuda().long()

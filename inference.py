@@ -28,8 +28,8 @@ hparams.filter_length = 1024
 hparams.hop_length = 256
 hparams.win_length = 1024
 
-#checkpoint_path = "/home/hwak1234/projects/tacotron2/outdir/checkpoint_15000"
-checkpoint_path = "/home/hwak1234/projects/tacotron2/nam_h_out/checkpoint_127000"
+checkpoint_path = "/home/hwak1234/projects/tacotron2/outdir/checkpoint_15000"
+#checkpoint_path = "/home/hwak1234/projects/tacotron2/nam_h_out/checkpoint_127000"
 model = load_model(hparams)
 try:
     model = model.module
@@ -38,10 +38,10 @@ except:
 model.load_state_dict({k.replace('module.',''):v for k,v in torch.load(checkpoint_path)['state_dict'].items()})
 _ = model.eval()
 
-# text = "This is an example of text to speech synthesis after 14 hours training."
-# sequence = np.array(text_to_sequence(text, ['english_cleaners']))[None, :]
-text = "딸기 타르트는 내가 제일 좋아하는 음식이야."
-sequence = np.array(text_to_sequence(text, ['korean_cleaners']))[None, :]
+text = "This is an example of text to speech synthesis after 14 hours training."
+sequence = np.array(text_to_sequence(text, ['english_cleaners']))[None, :]
+# text = "딸기 타르트는 내가 제일 좋아하는 음식이야."
+# sequence = np.array(text_to_sequence(text, ['korean_cleaners']))[None, :]
 sequence = torch.autograd.Variable(
     torch.from_numpy(sequence)).cuda().long()
 

@@ -18,7 +18,9 @@ from scipy.io.wavfile import write
 def plot_data(data, figsize=(16, 4)):
     fig, axes = plt.subplots(1, len(data), figsize=figsize)
     for i in range(len(data)):
-        axes[i].imshow(data[i], aspect='auto', origin='bottom',
+        # axes[i].imshow(data[i], aspect='auto', origin='bottom',
+        #                interpolation='none')
+        axes[i].imshow('{}.png'.format(i),data[i], aspect='auto', origin='bottom',
                        interpolation='none')
 
 hparams = create_hparams("distributed_run=False,mask_padding=False")
@@ -46,9 +48,9 @@ sequence = torch.autograd.Variable(
 
 stime = time.time()
 mel_outputs, mel_outputs_postnet, _, alignments = model.inference(sequence)
-# plot_data((mel_outputs.data.cpu().numpy()[0],
-#            mel_outputs_postnet.data.cpu().numpy()[0],
-#            alignments.data.cpu().numpy()[0].T))
+plot_data((mel_outputs.data.cpu().numpy()[0],
+           mel_outputs_postnet.data.cpu().numpy()[0],
+           alignments.data.cpu().numpy()[0].T))
 inf_time =  time.time() - stime
 
 stime = time.time()

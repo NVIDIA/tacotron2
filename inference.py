@@ -18,10 +18,9 @@ from scipy.io.wavfile import write
 def plot_data(data, figsize=(16, 4)):
     fig, axes = plt.subplots(1, len(data), figsize=figsize)
     for i in range(len(data)):
-        # axes[i].imshow(data[i], aspect='auto', origin='bottom',
-        #                interpolation='none')
-        axes[i].imshow('{}.png'.format(i),data[i], aspect='auto', origin='bottom',
-                       interpolation='none')
+        axes[i].imshow(data[i], aspect='auto', origin='bottom',
+                        interpolation='none')
+    plt.savefig('tmp.png')
 
 hparams = create_hparams("distributed_run=False,mask_padding=False")
 hparams.sampling_rate = 22050

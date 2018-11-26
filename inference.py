@@ -64,7 +64,7 @@ spec_from_mel = spec_from_mel * spec_from_mel_scaling
 
 waveform = griffin_lim(torch.autograd.Variable(spec_from_mel[:, :, :-1]),
                        taco_stft.stft_fn, 60)
-waveform = waveform[0].data.cpu().numpy()
+waveform = waveform[0].data.cpu().numpy()*hparams.max_wav_value
 print(waveform)
 waveform = waveform.astype('int16')
 print(waveform)

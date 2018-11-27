@@ -9,9 +9,11 @@ and uses the [LJSpeech dataset](https://keithito.com/LJ-Speech-Dataset/).
 Distributed and FP16 support relies on work by Christian Sarofeen and NVIDIA's
 [Apex Library](https://github.com/nvidia/apex).
 
+Visit our [website] for audio samples using our published [Tacotron 2] and
+[WaveGlow] models.
+
 ![Alignment, Predicted Mel Spectrogram, Target Mel Spectrogram](tensorboard.png)
 
-Visit our [website] for audio samples.
 
 ## Pre-requisites
 1. NVIDIA GPU + CUDA cuDNN

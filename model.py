@@ -56,7 +56,7 @@ class Attention(nn.Module):
 
         processed_query = self.query_layer(query.unsqueeze(1))
         processed_attention_weights = self.location_layer(attention_weights_cat)
-        energies = self.v(F.tanh(
+        energies = self.v(torch.tanh(
             processed_query + processed_attention_weights + processed_memory))
 
         energies = energies.squeeze(-1)
@@ -141,7 +141,7 @@ class Postnet(nn.Module):
 
     def forward(self, x):
         for i in range(len(self.convolutions) - 1):
-            x = self.dropout(F.tanh(self.convolutions[i](x)))
+            x = self.dropout(torch.tanh(self.convolutions[i](x)))
 
         x = self.dropout(self.convolutions[-1](x))
 
@@ -436,7 +436,7 @@ class Decoder(nn.Module):
             gate_outputs += [gate_output.squeeze(1)]
             alignments += [alignment]
 
-            if F.sigmoid(gate_output.data) > self.gate_threshold:
+            if torch.sigmoid(gate_output.data) > self.gate_threshold:
                 break
             elif len(mel_outputs) == self.max_decoder_steps:
                 print("Warning! Reached max decoder steps")

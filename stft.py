@@ -61,7 +61,7 @@ class STFT(torch.nn.Module):
             np.linalg.pinv(scale * fourier_basis).T[:, None, :])
 
         if window is not None:
-            assert(win_length >= filter_length)
+            assert(filter_length >= win_length)
             # get window and zero center pad it to filter_length
             fft_window = get_window(window, win_length, fftbins=True)
             fft_window = pad_center(fft_window, filter_length)

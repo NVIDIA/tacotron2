@@ -16,7 +16,7 @@ def create_hparams(hparams_string=None, verbose=False):
         fp16_run=False,
         distributed_run=False,
         dist_backend="nccl",
-        dist_url="file://distributed.dpt",
+        dist_url="tcp://localhost:54321",
         cudnn_enabled=True,
         cudnn_benchmark=False,
 

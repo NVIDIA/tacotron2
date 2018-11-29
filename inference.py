@@ -30,7 +30,7 @@ hparams.win_length = 1024
 
 # checkpoint_path = "/home/hwak1234/projects/tacotron2/outdir/checkpoint_15000"
 # hparams.n_symbols = 149
-checkpoint_path = "/home/hwak1234/projects/tacotron2/nam_h_out/checkpoint_10000"
+checkpoint_path = "/home/hwak1234/projects/tacotron2/nam_h_ep2/checkpoint_61500"
 hparams.n_symbols = 80
 model = load_model(hparams)
 try:

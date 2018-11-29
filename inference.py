@@ -44,7 +44,7 @@ _ = model.eval()
 # sequence = np.array(text_to_sequence(text, ['english_cleaners']))[None, :]
 text = "테스트 문장이야."
 sequence = np.array(text_to_sequence(text, ['korean_cleaners']))[None, :]
-print(sequence)
+#print(sequence)
 sequence = torch.autograd.Variable(
     torch.from_numpy(sequence)).cuda().long()
 

@@ -40,7 +40,8 @@ except:
 model.load_state_dict({k.replace('module.',''):v for k,v in torch.load(checkpoint_path)['state_dict'].items()})
 _ = model.eval()
 
-text = "This is an example of text to speech synthesis after 14 hours training."
+#text = "This is an example of text to speech synthesis after 14 hours training."
+text = "This is really awsome!"
 sequence = np.array(text_to_sequence(text, ['english_cleaners']))[None, :]
 # text = "테스트 문장이야."
 # sequence = np.array(text_to_sequence(text, ['korean_cleaners']))[None, :]

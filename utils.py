@@ -1,8 +1,10 @@
 import numpy as np
 from scipy.io.wavfile import read
 from scipy import signal
+import librosa
 import torch
 
+max_wav_value=32768.0
 
 def get_mask_from_lengths(lengths):
     max_len = torch.max(lengths)
@@ -10,13 +12,14 @@ def get_mask_from_lengths(lengths):
     mask = (ids < lengths.unsqueeze(1)).byte()
     return mask
 
-
 def load_wav_to_torch(full_path, sr):
     sampling_rate, data = read(full_path)
     if sr != sampling_rate:
-        rate = sr/sampling_rate
-        data = signal.resample(data, int(len(data)*rate))
-        sampling_rate = sr
+        # rate = sr/sampling_rate
+        # data = signal.resample(data, int(len(data)*rate))
+        # sampling_rate = sr
+        data, sampling_rate = librosa.load(full_path, sr)
+        data = data*max_wav_value
     assert sr == sampling_rate, "{} SR doesn't match {} on path {}".format(
         sr, sampling_rate, full_path)
     return torch.FloatTensor(data.astype(np.float32))

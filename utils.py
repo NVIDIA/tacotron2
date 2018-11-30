@@ -13,16 +13,7 @@ def get_mask_from_lengths(lengths):
     return mask
 
 def load_wav_to_torch(full_path, sr):
-    sampling_rate, data = read(full_path)
-    if sr != sampling_rate:
-        # rate = sr/sampling_rate
-        # data = signal.resample(data, int(len(data)*rate))
-        # sampling_rate = sr
-        data, sampling_rate = librosa.core.load(full_path, sr)
-        #data, sampling_rate = librosa.load(full_path, sampling_rate)
-        #data = librosa.resample(data.astype(float), sampling_rate, sr, 'kaiser_best')
-        #data = data_*max_wav_value
-        sampling_rate = sr
+    data, sampling_rate = librosa.core.load(full_path, sr)
     assert sr == sampling_rate, "{} SR doesn't match {} on path {}".format(
         sr, sampling_rate, full_path)
     return torch.FloatTensor(data.astype(np.float32))

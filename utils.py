@@ -12,12 +12,12 @@ def get_mask_from_lengths(lengths):
     return mask
 
 def load_wav_to_torch(full_path, sr):
-    ## make learning fast
-    #sampling_rate, data = read(full_path, sr)
+    # make learning fast
+    sampling_rate, data = read(full_path, sr)
 
-    # make learning slow
-    data, sampling_rate = librosa.core.load(full_path, sr)
-    data=data*max_wav_value
+    # # make learning slow
+    # data, sampling_rate = librosa.core.load(full_path, sr)
+    # data=data*max_wav_value
     assert sr == sampling_rate, "{} SR doesn't match {} on path {}".format(
         sr, sampling_rate, full_path)
     return torch.FloatTensor(data.astype(np.float32))

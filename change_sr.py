@@ -3,7 +3,7 @@ import librosa
 
 sr = 22050
 max_wav_value=32768.0
-file_list = ['nam-h_test_filelist.txt', 'nam-h_train_filelist.txt', 'nam-h_val_filelist.txt']
+file_list = ['filelists/nam-h_test_filelist.txt', 'filelists/nam-h_train_filelist.txt', 'filelists/nam-h_val_filelist.txt']
 
 for F in file_list:
     f = open(F)

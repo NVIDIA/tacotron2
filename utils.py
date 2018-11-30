@@ -18,8 +18,11 @@ def load_wav_to_torch(full_path, sr):
         # rate = sr/sampling_rate
         # data = signal.resample(data, int(len(data)*rate))
         # sampling_rate = sr
-        data, sampling_rate = librosa.load(full_path, sr)
-        data = data*max_wav_value
+        data, sampling_rate = librosa.core.load(full_path, sr)
+        #data, sampling_rate = librosa.load(full_path, sampling_rate)
+        #data = librosa.resample(data.astype(float), sampling_rate, sr, 'kaiser_best')
+        #data = data_*max_wav_value
+        sampling_rate = sr
     assert sr == sampling_rate, "{} SR doesn't match {} on path {}".format(
         sr, sampling_rate, full_path)
     return torch.FloatTensor(data.astype(np.float32))

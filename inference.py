@@ -28,10 +28,10 @@ hparams.filter_length = 1024
 hparams.hop_length = 256
 hparams.win_length = 1024
 
-# checkpoint_path = "/home/hwak1234/projects/tacotron2/outdir/checkpoint_15000"
-# hparams.n_symbols = 149
-checkpoint_path = "/home/hwak1234/projects/tacotron2/nam_h_ep2/checkpoint_61500"
-hparams.n_symbols = 80
+checkpoint_path = "/home/hwak1234/projects/tacotron2/outdir/checkpoint_15000"
+hparams.n_symbols = 149
+# checkpoint_path = "/home/hwak1234/projects/tacotron2/nam_h_ep2/checkpoint_61500"
+# hparams.n_symbols = 80
 model = load_model(hparams)
 try:
     model = model.module
@@ -40,13 +40,12 @@ except:
 model.load_state_dict({k.replace('module.',''):v for k,v in torch.load(checkpoint_path)['state_dict'].items()})
 _ = model.eval()
 
-# text = "This is an example of text to speech synthesis after 14 hours training."
-# sequence = np.array(text_to_sequence(text, ['english_cleaners']))[None, :]
-text = "테스트 문장이야."
-sequence = np.array(text_to_sequence(text, ['korean_cleaners']))[None, :]
+text = "This is an example of text to speech synthesis after 14 hours training."
+sequence = np.array(text_to_sequence(text, ['english_cleaners']))[None, :]
+# text = "테스트 문장이야."
+# sequence = np.array(text_to_sequence(text, ['korean_cleaners']))[None, :]
 #print(sequence)
-sequence = torch.autograd.Variable(
-    torch.from_numpy(sequence)).cuda().long()
+sequence = torch.autograd.Variable(torch.from_numpy(sequence)).cuda().long()
 
 stime = time.time()
 mel_outputs, mel_outputs_postnet, _, alignments = model.inference(sequence)

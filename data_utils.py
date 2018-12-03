@@ -21,7 +21,7 @@ class TextMelLoader(torch.utils.data.Dataset):
         self.max_wav_value = hparams.max_wav_value
         self.sampling_rate = hparams.sampling_rate
         self.load_mel_from_disk = hparams.load_mel_from_disk
-        self.is_flot_wav = hparams.is_float_wav
+        self.is_float_wav = hparams.is_float_wav
         self.stft = layers.TacotronSTFT(
             hparams.filter_length, hparams.hop_length, hparams.win_length,
             hparams.n_mel_channels, hparams.sampling_rate, hparams.mel_fmin,
@@ -40,7 +40,7 @@ class TextMelLoader(torch.utils.data.Dataset):
     def get_mel(self, filename):
         if not self.load_mel_from_disk:
             audio = load_wav_to_torch(filename, self.sampling_rate)
-            audio_norm = audio if self.is_flot_wav else audio / self.max_wav_value
+            audio_norm = audio if self.is_float_wav else audio / self.max_wav_value
             audio_norm = audio_norm.unsqueeze(0)
             audio_norm = torch.autograd.Variable(audio_norm, requires_grad=False)
             melspec = self.stft.mel_spectrogram(audio_norm)

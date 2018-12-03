@@ -22,7 +22,7 @@ def create_hparams(hparams_string=None, verbose=False):
         # Data Parameters             #
         ################################
         load_mel_from_disk=False,
-        is_flot_wav = True, # Set true
+        is_float_wav = True, # Set true
         training_files='filelists/nam-h_train_filelist.txt',
         validation_files='filelists/nam-h_val_filelist.txt',
         text_cleaners=['korean_cleaners'], # english_cleaners, korean_cleaners

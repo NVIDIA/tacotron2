@@ -22,7 +22,6 @@ def create_hparams(hparams_string=None, verbose=False):
         # Data Parameters             #
         ################################
         load_mel_from_disk=False,
-        is_float_wav = True, # Set true
         training_files='filelists/nam-h_train_filelist.txt',
         validation_files='filelists/nam-h_val_filelist.txt',
         text_cleaners=['korean_cleaners'], # english_cleaners, korean_cleaners
@@ -34,8 +33,8 @@ def create_hparams(hparams_string=None, verbose=False):
         max_wav_value=32768.0,
         sampling_rate=22050,
         filter_length=1024,
-        hop_length=256,
-        win_length=1024,
+        hop_length=256, # number audio of frames between stft colmns, default win_length/4
+        win_length=1024, # win_length int <= n_ftt: fft window size (frequency domain), defaults to win_length = n_fft
         n_mel_channels=80,
         mel_fmin=0.0,
         mel_fmax=None,  # if None, half the sampling rate

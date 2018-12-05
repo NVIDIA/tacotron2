@@ -8,11 +8,12 @@ def create_hparams(hparams_string=None, verbose=False):
         # Experiment Parameters        #
         ################################
         epochs=500,
-        iters_per_checkpoint=500,
+        iters_per_checkpoint=5000,
         seed=1234,
         dynamic_loss_scaling=True,
         fp16_run=True,
         distributed_run=False,
+
         dist_backend="nccl",
         dist_url="file://distributed.dpt",
         cudnn_enabled=True,

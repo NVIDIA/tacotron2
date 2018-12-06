@@ -112,9 +112,21 @@ def GTA_Synthesis(output_directory, log_directory, checkpoint_path, warm_start, 
     for i, batch in enumerate(train_loader):
         #org_index = np.arange(i*hparams.batch_size,(i+1)*hparams.batch_size).tolist()
         audiopaths_and_text = train_set.audiopaths_and_text[i*hparams.batch_size:(i+1)*hparams.batch_size]
-        input_lengths, ids_sorted_decreasing = torch.sort(
-            torch.LongTensor([len(x[0]) for x in batch]),
-            dim=0, descending=True)
+        indx_list = np.arange(i*hparams.batch_size,(i+1)*hparams.batch_size).tolist()
+        len_text_list = []
+        len_mel_list = []
+        for batch_index in indx_list:
+            text, mel = train_set.get_mel_text_pair(batch_index)
+            text = text.numpy()
+            mel = mel.numpy()
+            len_text_list.append(len(text))
+            len_mel_list.append(len(mel))
+        text_padded, input_lengths, mel_padded, gate_padded, output_lengths = batch
+        print(input_lengths.numpy())
+        print(len_text_list)
+        print(output_lengths.numpy())
+        print(len_mel_list)
+
         x, y = batch_parser(batch)
         mel_outputs, mel_outputs_postnet, _, alignments = model(x)
         print(i, mel_outputs_postnet.data.cpu().numpy().shape)

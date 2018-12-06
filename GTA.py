@@ -116,7 +116,7 @@ def GTA_Synthesis(output_directory, log_directory, checkpoint_path, warm_start, 
         len_text_list = []
         len_mel_list = []
         for batch_index in indx_list:
-            text, mel = train_set.get_mel_text_pair(batch_index)
+            text, mel = train_set.__getitem__(batch_index)
             text = text.numpy()
             mel = mel.numpy()
             len_text_list.append(len(text))

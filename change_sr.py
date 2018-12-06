@@ -1,4 +1,3 @@
-from scipy.io.wavfile import read
 from scipy.io.wavfile import write
 import librosa
 import numpy as np

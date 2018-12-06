@@ -16,7 +16,7 @@ class TextMelLoader(torch.utils.data.Dataset):
     """
     def __init__(self, audiopaths_and_text, hparams, shuffle=True):
         self.audiopaths_and_text = load_filepaths_and_text(
-            audiopaths_and_text, hparams.sort_by_length)
+            audiopaths_and_text, hparams.sort_by_length) # [[audio_path, text], ... ]
         self.text_cleaners = hparams.text_cleaners
         self.max_wav_value = hparams.max_wav_value
         self.sampling_rate = hparams.sampling_rate
@@ -32,18 +32,18 @@ class TextMelLoader(torch.utils.data.Dataset):
     def get_mel_text_pair(self, audiopath_and_text):
         # separate filename and text
         audiopath, text = audiopath_and_text[0], audiopath_and_text[1]
-        text = self.get_text(text)
-        mel = self.get_mel(audiopath)
+        text = self.get_text(text) # int_tensor[char_index, ....]
+        mel = self.get_mel(audiopath) # []
         return (text, mel)
 
     def get_mel(self, filename):
         if not self.load_mel_from_disk:
-            audio = load_wav_to_torch(filename, self.sampling_rate)
-            audio_norm = audio / self.max_wav_value
-            audio_norm = audio_norm.unsqueeze(0)
-            audio_norm = torch.autograd.Variable(audio_norm, requires_grad=False)
-            melspec = self.stft.mel_spectrogram(audio_norm)
-            melspec = torch.squeeze(melspec, 0)
+            audio = load_wav_to_torch(filename, self.sampling_rate) # float_tensor[amplitude, ..], 1d
+            audio_norm = audio / self.max_wav_value # normalize
+            audio_norm = audio_norm.unsqueeze(0) # 1d to 2d, [n] -> [1, n]
+            audio_norm = torch.autograd.Variable(audio_norm, requires_grad=False) # what is this?
+            melspec = self.stft.mel_spectrogram(audio_norm) # input [1, n] -> output [1, num_mel_channels, T], T = ceil((n+1)/hop_length)
+            melspec = torch.squeeze(melspec, 0) #[1, num_mel_channels, T] -> [num_mell_channesl, T]
         else:
             melspec = torch.from_numpy(np.load(filename))
             assert melspec.size(0) == self.stft.n_mel_channels, (
@@ -73,7 +73,7 @@ class TextMelCollate():
         """Collate's training batch from normalized text and mel-spectrogram
         PARAMS
         ------
-        batch: [text_normalized, mel_normalized]
+        batch: [[text_normalized, mel_normalized], ...]
         """
         # Right zero-pad all one-hot text sequences to max input length
         input_lengths, ids_sorted_decreasing = torch.sort(

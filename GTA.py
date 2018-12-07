@@ -112,7 +112,7 @@ def GTA_Synthesis(output_directory, log_directory, checkpoint_path, warm_start, 
     for i, batch in enumerate(train_loader):
         #org_index = np.arange(i*hparams.batch_size,(i+1)*hparams.batch_size).tolist()
         audiopaths_and_text = train_set.audiopaths_and_text[i*hparams.batch_size:(i+1)*hparams.batch_size]
-        indx_list = np.arange(i*hparams.batch_size,(i+1)*hparams.batch_size).tolist()
+        indx_list = np.arange(0,hparams.batch_size).tolist()
         len_text_list = []
         len_mel_list = []
         for batch_index in indx_list:
@@ -120,8 +120,11 @@ def GTA_Synthesis(output_directory, log_directory, checkpoint_path, warm_start, 
             len_text_list.append(text.size(0))
             len_mel_list.append(mel.size(1))
         text_padded, input_lengths, mel_padded, gate_padded, output_lengths = batch
+        input_lengths_, ids_sorted_decreasing_ = torch.sort(torch.LongTensor(input_lengths), dim=0, descending=True)
         print(input_lengths.numpy())
+        print(input_lengths_.numpy())
         print(len_text_list)
+        print(ids_sorted_decreasing_)
         print(output_lengths.numpy())
         print(len_mel_list)
 

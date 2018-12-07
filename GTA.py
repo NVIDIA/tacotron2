@@ -111,25 +111,32 @@ def GTA_Synthesis(output_directory, log_directory, checkpoint_path, warm_start, 
         # ================ MAIN TRAINNIG LOOP! ===================
     f = open(os.path.join(output_directory, 'map.txt'),'w', encoding='utf-8')
     os.makedirs(os.path.join(output_directory,'mels'), exist_ok=True)
+
     total_number_of_data = len(train_set.audiopaths_and_text)
     max_itter = int(total_number_of_data/hparams.batch_size)
     remainder_size = total_number_of_data % hparams.batch_size
     
     for i, batch in enumerate(train_loader):
-        # get wavefile path
-        audiopaths_and_text = train_set.audiopaths_and_text[i*hparams.batch_size:(i+1)*hparams.batch_size]
-        audiopaths = [ x[0] for x in audiopaths_and_text] # file name list
         batch_size = hparams.batch_size if i is not max_itter else remainder_size
 
+        # get wavefile path
+        audiopaths_and_text = train_set.audiopaths_and_text[i*hparams.batch_size:i*hparams.batch_size + batch_size]
+        audiopaths = [ x[0] for x in audiopaths_and_text] # file name list
+
+
         # get len texts
-        indx_list = np.arange(0, batch_size).tolist()
+        indx_list = np.arange(i*hparams.batch_size, i*hparams.batch_size + batch_size).tolist()
         len_text_list = []
         for batch_index in indx_list:
             text, _ = train_set.__getitem__(batch_index)
             len_text_list.append(text.size(0))
-        _, _, _, _, output_lengths = batch # output_lengths: orgnal mel length
-        _, ids_sorted_decreasing = torch.sort(torch.LongTensor(len_text_list), dim=0, descending=True)
+        _, input_lengths, _, _, output_lengths = batch # output_lengths: orgnal mel length
+        input_lengths_, ids_sorted_decreasing = torch.sort(torch.LongTensor(len_text_list), dim=0, descending=True)
         ids_sorted_decreasing = ids_sorted_decreasing.numpy() # ids_sorted_decreasing, original index
+
+        # for debugging
+        print(input_lengths)
+        print(input_lengths_)
 
         org_audiopaths = [] # orgnal_file_name
         mel_paths = []
@@ -150,6 +157,8 @@ def GTA_Synthesis(output_directory, log_directory, checkpoint_path, warm_start, 
             mel = mel_outputs_postnet[i,:,:output_lengths[k]]
             np.save(mel_path, mel)
         print('compute and save melspectrograms in {}th batch'.format(i))
+        if i == 3:
+            break
     f.close()
 
 if __name__ == '__main__':

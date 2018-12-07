@@ -135,8 +135,8 @@ def GTA_Synthesis(output_directory, log_directory, checkpoint_path, warm_start, 
         ids_sorted_decreasing = ids_sorted_decreasing.numpy() # ids_sorted_decreasing, original index
 
         # for debugging
-        print(input_lengths)
-        print(input_lengths_)
+        # print(input_lengths)
+        # print(input_lengths_)
 
         org_audiopaths = [] # orgnal_file_name
         mel_paths = []
@@ -157,8 +157,6 @@ def GTA_Synthesis(output_directory, log_directory, checkpoint_path, warm_start, 
             mel = mel_outputs_postnet[i,:,:output_lengths[k]]
             np.save(mel_path, mel)
         print('compute and save melspectrograms in {}th batch'.format(i))
-        if i == 3:
-            break
     f.close()
 
 if __name__ == '__main__':

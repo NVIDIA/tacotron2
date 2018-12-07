@@ -140,7 +140,7 @@ def GTA_Synthesis(output_directory, log_directory, checkpoint_path, warm_start, 
 
         org_audiopaths = [] # orgnal_file_name
         mel_paths = []
-        for k in range(hparams.batch_size):
+        for k in range(batch_size):
             d = audiopaths[ids_sorted_decreasing[k]]
             org_audiopaths.append(d)
             mel_paths.append(d.replace('wav','mel'))
@@ -148,13 +148,14 @@ def GTA_Synthesis(output_directory, log_directory, checkpoint_path, warm_start, 
         x, _ = batch_parser(batch)
         _, mel_outputs_postnet, _, _ = model(x)
         mel_outputs_postnet = mel_outputs_postnet.data.cpu().numpy()
-        for k in range(hparams.batch_size):
+
+        for k in range(batch_size):
             wav_path = org_audiopaths[k]
             mel_path = mel_paths[k]
             map = "{}|{}\n".format(wav_path,mel_path)
             f.write(map)
 
-            mel = mel_outputs_postnet[i,:,:output_lengths[k]]
+            mel = mel_outputs_postnet[k,:,:output_lengths[k]]
             np.save(mel_path, mel)
         print('compute and save melspectrograms in {}th batch'.format(i))
     f.close()

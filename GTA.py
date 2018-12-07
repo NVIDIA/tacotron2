@@ -109,44 +109,46 @@ def GTA_Synthesis(output_directory, log_directory, checkpoint_path, warm_start, 
     else:
         batch_parser = model.parse_batch
         # ================ MAIN TRAINNIG LOOP! ===================
+    f = open(os.path.join(output_directory, 'map.txt'),'w', encoding='utf-8')
+    os.mkdir(os.path.join(output_directory,'mels'), exist_ok=True)
     for i, batch in enumerate(train_loader):
         # get wavefile path
         audiopaths_and_text = train_set.audiopaths_and_text[i*hparams.batch_size:(i+1)*hparams.batch_size]
         audiopaths = [ x[0] for x in audiopaths_and_text] # file name list
 
-        # get len texts, len mels
+        # get len texts
         indx_list = np.arange(0, hparams.batch_size).tolist()
         len_text_list = []
-        len_mel_list = [] # mel lenngth
         for batch_index in indx_list:
-            text, mel = train_set.__getitem__(batch_index)
+            text, _ = train_set.__getitem__(batch_index)
             len_text_list.append(text.size(0))
-            len_mel_list.append(mel.size(1))
-        text_padded, input_lengths, mel_padded, gate_padded, output_lengths = batch
-        input_lengths_, ids_sorted_decreasing_ = torch.sort(torch.LongTensor(len_text_list), dim=0, descending=True)
-        ids_sorted_decreasing_ = ids_sorted_decreasing_.numpy() # ids_sorted_decreasing_, original index
+        _, _, _, _, output_lengths = batch # output_lengths: orgnal mel length
+        _, ids_sorted_decreasing = torch.sort(torch.LongTensor(len_text_list), dim=0, descending=True)
+        ids_sorted_decreasing = ids_sorted_decreasing.numpy() # ids_sorted_decreasing, original index
 
-        org_audiopaths = []
-        org_mel_lengths = []
+        org_audiopaths = [] # orgnal_file_name
+        mel_paths = []
         for k in range(hparams.batch_size):
-            org_audiopaths.append(audiopaths[ids_sorted_decreasing_[k]])
-            org_mel_lengths.append(len_mel_list[ids_sorted_decreasing_[k]])
+            d = audiopaths[ids_sorted_decreasing[k]]
+            org_audiopaths.append(d)
+            mel_paths.append(d.replace('wav','mel'))
 
-        # for debugging
-        print(input_lengths.numpy())
-        print(input_lengths_.numpy())
-        print(len_text_list)
-        print(ids_sorted_decreasing_) # original index
-        print(output_lengths.numpy())
-        print(org_mel_lengths)
-        print(len_mel_list)
+        x, _ = batch_parser(batch)
+        _, mel_outputs_postnet, _, _ = model(x)
+        mel_outputs_postnet = mel_outputs_postnet.numpy()
+        for k in range(hparams.batch_size):
+            wav_path = org_audiopaths[k]
+            mel_path = mel_paths[k]
+            map = "{}|{}\n".format(wav_path,mel_path)
+            f.write(map)
 
-
-        x, y = batch_parser(batch)
-        mel_outputs, mel_outputs_postnet, _, alignments = model(x)
-        print(i, mel_outputs_postnet.data.cpu().numpy().shape)
+            mel = mel_outputs_postnet[i,:,:output_lengths[k]]
+            print(mel.shape)
+            np.save(mel_paths, mel)
+        print('compute and save melspectrograms in {}th batch'.format(i))
         if i == 0:
-            break;
+            break
+    f.close()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

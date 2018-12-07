@@ -6,7 +6,7 @@ sr = 22050
 half_sr = int(sr/2)
 max_wav_value=32768.0
 file_list = ['filelists/nam-h_test_filelist.txt', 'filelists/nam-h_train_filelist.txt', 'filelists/nam-h_val_filelist.txt']
-#file_list = ['filelists/lj_audio_text_test_filelist.txt', 'filelists/lj_audio_text_train_filelist.txt', 'filelists/lj_audio_text_val_filelist.txt']
+#file_list = ['filelists/ljs_audio_text_test_filelist.txt', 'filelists/ljs_audio_text_train_filelist.txt', 'filelists/ljs_audio_text_val_filelist.txt']
 # M-AILABS (and other datasets) trim params
 trim_fft_size = 1024
 trim_hop_size = 256

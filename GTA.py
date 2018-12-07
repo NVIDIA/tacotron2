@@ -80,7 +80,7 @@ def warm_start_model(checkpoint_path, model):
     return model
 
 
-def GTA_Synthesis(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
+def GTA_Synthesis(output_directory, checkpoint_path, n_gpus,
           rank, group_name, hparams):
     """
     Params
@@ -151,7 +151,7 @@ def GTA_Synthesis(output_directory, log_directory, checkpoint_path, warm_start, 
 
         for k in range(batch_size):
             wav_path = org_audiopaths[k]
-            mel_path = mel_paths[k]
+            mel_path = mel_paths[k]+'.npy'
             map = "{}|{}\n".format(wav_path,mel_path)
             f.write(map)
 
@@ -164,12 +164,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', '--output_directory', type=str,
                         help='directory to save checkpoints')
-    parser.add_argument('-l', '--log_directory', type=str,
-                        help='directory to save tensorboard logs')
     parser.add_argument('-c', '--checkpoint_path', type=str, default=None,
                         required=False, help='checkpoint path')
-    parser.add_argument('--warm_start', action='store_true',
-                        help='load the model only (warm start)')
     parser.add_argument('--n_gpus', type=int, default=1,
                         required=False, help='number of gpus')
     parser.add_argument('--rank', type=int, default=0,
@@ -190,5 +186,4 @@ if __name__ == '__main__':
     print("cuDNN Enabled:", hparams.cudnn_enabled)
     print("cuDNN Benchmark:", hparams.cudnn_benchmark)
 
-    GTA_Synthesis(args.output_directory, args.log_directory, args.checkpoint_path,
-          args.warm_start, args.n_gpus, args.rank, args.group_name, hparams)
+    GTA_Synthesis(args.output_directory, args.checkpoint_path, args.n_gpus, args.rank, args.group_name, hparams)

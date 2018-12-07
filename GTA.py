@@ -120,7 +120,7 @@ def GTA_Synthesis(output_directory, log_directory, checkpoint_path, warm_start, 
             len_text_list.append(text.size(0))
             len_mel_list.append(mel.size(1))
         text_padded, input_lengths, mel_padded, gate_padded, output_lengths = batch
-        input_lengths_, ids_sorted_decreasing_ = torch.sort(torch.LongTensor(input_lengths), dim=0, descending=True)
+        input_lengths_, ids_sorted_decreasing_ = torch.sort(torch.LongTensor(len_text_list), dim=0, descending=True)
         print(input_lengths.numpy())
         print(input_lengths_.numpy())
         print(len_text_list)

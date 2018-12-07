@@ -111,13 +111,18 @@ def GTA_Synthesis(output_directory, log_directory, checkpoint_path, warm_start, 
         # ================ MAIN TRAINNIG LOOP! ===================
     f = open(os.path.join(output_directory, 'map.txt'),'w', encoding='utf-8')
     os.makedirs(os.path.join(output_directory,'mels'), exist_ok=True)
+    total_number_of_data = len(train_set.audiopaths_and_text)
+    max_itter = int(total_number_of_data/hparams.batch_size)
+    remainder_size = total_number_of_data % hparams.batch_size
+    
     for i, batch in enumerate(train_loader):
         # get wavefile path
         audiopaths_and_text = train_set.audiopaths_and_text[i*hparams.batch_size:(i+1)*hparams.batch_size]
         audiopaths = [ x[0] for x in audiopaths_and_text] # file name list
+        batch_size = hparams.batch_size if i is not max_itter else remainder_size
 
         # get len texts
-        indx_list = np.arange(0, hparams.batch_size).tolist()
+        indx_list = np.arange(0, batch_size).tolist()
         len_text_list = []
         for batch_index in indx_list:
             text, _ = train_set.__getitem__(batch_index)

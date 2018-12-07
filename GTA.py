@@ -136,7 +136,7 @@ def GTA_Synthesis(output_directory, log_directory, checkpoint_path, warm_start, 
         print(input_lengths.numpy())
         print(input_lengths_.numpy())
         print(len_text_list)
-        print(ids_sorted_decreasing_.numpy()) # original index
+        print(ids_sorted_decreasing_) # original index
         print(output_lengths.numpy())
         print(org_mel_lengths)
         print(len_mel_list)

@@ -110,7 +110,7 @@ def GTA_Synthesis(output_directory, log_directory, checkpoint_path, warm_start, 
         batch_parser = model.parse_batch
         # ================ MAIN TRAINNIG LOOP! ===================
     f = open(os.path.join(output_directory, 'map.txt'),'w', encoding='utf-8')
-    os.mkdir(os.path.join(output_directory,'mels'), exist_ok=True)
+    os.makedirs(os.path.join(output_directory,'mels'), exist_ok=True)
     for i, batch in enumerate(train_loader):
         # get wavefile path
         audiopaths_and_text = train_set.audiopaths_and_text[i*hparams.batch_size:(i+1)*hparams.batch_size]
@@ -135,7 +135,7 @@ def GTA_Synthesis(output_directory, log_directory, checkpoint_path, warm_start, 
 
         x, _ = batch_parser(batch)
         _, mel_outputs_postnet, _, _ = model(x)
-        mel_outputs_postnet = mel_outputs_postnet.numpy()
+        mel_outputs_postnet = mel_outputs_postnet.data.cpu().numpy()
         for k in range(hparams.batch_size):
             wav_path = org_audiopaths[k]
             mel_path = mel_paths[k]
@@ -143,11 +143,8 @@ def GTA_Synthesis(output_directory, log_directory, checkpoint_path, warm_start, 
             f.write(map)
 
             mel = mel_outputs_postnet[i,:,:output_lengths[k]]
-            print(mel.shape)
-            np.save(mel_paths, mel)
+            np.save(mel_path, mel)
         print('compute and save melspectrograms in {}th batch'.format(i))
-        if i == 0:
-            break
     f.close()
 
 if __name__ == '__main__':

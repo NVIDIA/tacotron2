@@ -23,11 +23,12 @@ def run():
         for i, r in enumerate(R):
             wav_file = r.split('|')[0]
             data, sampling_rate = librosa.core.load(wav_file, sr)
-            data = librosa.effects.trim(data, top_db= trim_top_db, frame_length=trim_fft_size, hop_length=trim_hop_size)[0]
-            data = data*max_wav_value
-            data = np.append(data, [0.]*half_sr)
-            data = data.astype(dtype=np.int16)
-            write(wav_file, sr, data)
+            data_= librosa.effects.trim(data, top_db= trim_top_db, frame_length=trim_fft_size, hop_length=trim_hop_size)[0]
+            data_ = data_*max_wav_value          
+            data_ = np.append(data_, [0.]*half_sr)
+            data_ = data_.astype(dtype=np.int16)
+            write(wav_file, sr, data_)
+            print(len(data),len(data_))
             if(i%100 == 0):
                 print (i)
 

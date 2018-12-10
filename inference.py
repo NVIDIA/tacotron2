@@ -104,4 +104,8 @@ if __name__ == '__main__':
     torch.backends.cudnn.benchmark = hparams.cudnn_benchmark
 
     run(hparams, args.checkpoint_path, args.sentence_path, args.cleaner, args.output_directory)
+    """
+    example to run 
+    python inference.py -o=synthesis/5000 -c=nam_h_ep7/checkpoint_5000 -s=test.txt --cleaner='korean_cleaner'
+    """
 

@@ -28,7 +28,7 @@ def run():
             data_ = np.append(data_, [0.]*pad_size)
             data_ = data_.astype(dtype=np.int16)
             write(wav_file, sr, data_)
-            print(len(data),len(data_))
+            #print(len(data),len(data_))
             if(i%100 == 0):
                 print (i)
 

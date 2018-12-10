@@ -3,7 +3,7 @@ import librosa
 import numpy as np
 
 sr = 22050
-half_sr = int(sr/2)
+pad_size = int(sr/25)
 max_wav_value=32768.0
 file_list = ['filelists/nam-h_test_filelist.txt', 'filelists/nam-h_train_filelist.txt', 'filelists/nam-h_val_filelist.txt']
 #file_list = ['filelists/ljs_audio_text_test_filelist.txt', 'filelists/ljs_audio_text_train_filelist.txt', 'filelists/ljs_audio_text_val_filelist.txt']
@@ -25,7 +25,7 @@ def run():
             data, sampling_rate = librosa.core.load(wav_file, sr)
             data_= librosa.effects.trim(data, top_db= trim_top_db, frame_length=trim_fft_size, hop_length=trim_hop_size)[0]
             data_ = data_*max_wav_value          
-            data_ = np.append(data_, [0.]*half_sr)
+            data_ = np.append(data_, [0.]*pad_size)
             data_ = data_.astype(dtype=np.int16)
             write(wav_file, sr, data_)
             print(len(data),len(data_))

@@ -87,8 +87,6 @@ if __name__ == '__main__':
                         required=True, help='checkpoint path')
     parser.add_argument('-s', '--sentence_path', type=str, default=None,
                         required=True, help='sentence path')
-    parser.add_argument('--cleaner', type=str, default='english_cleaner',
-                        required=True, help='cleaner')
     parser.add_argument('--hparams', type=str,
                         required=False, help='comma separated name=value pairs')
 
@@ -103,7 +101,7 @@ if __name__ == '__main__':
     torch.backends.cudnn.enabled = hparams.cudnn_enabled
     torch.backends.cudnn.benchmark = hparams.cudnn_benchmark
 
-    run(hparams, args.checkpoint_path, args.sentence_path, args.cleaner, args.output_directory)
+    run(hparams, args.checkpoint_path, args.sentence_path, hparams.cleaner, args.output_directory)
     """
     example to run 
     python inference.py -o=synthesis/5000 -c=nam_h_ep7/checkpoint_5000 -s=test.txt --cleaner='korean_cleaner'

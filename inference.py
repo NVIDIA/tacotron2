@@ -103,5 +103,5 @@ if __name__ == '__main__':
     torch.backends.cudnn.enabled = hparams.cudnn_enabled
     torch.backends.cudnn.benchmark = hparams.cudnn_benchmark
 
-    run(hparams, args.checkpoint_path, args.sentence_path, args.cleaner, args.output_dir)
+    run(hparams, args.checkpoint_path, args.sentence_path, args.cleaner, args.output_directory)
 

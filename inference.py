@@ -34,6 +34,7 @@ def generate_mels(hparams, checkpoint_path, sentences, cleaner, output_dir=""):
     output_mels = []
     for i, s in enumerate(sentences):
         sequence = np.array(text_to_sequence(s, [cleaner]))[None, :]
+        print(sequence)
         sequence = torch.autograd.Variable(torch.from_numpy(sequence)).cuda().long()
 
         stime = time.time()
@@ -73,6 +74,7 @@ def mels_to_wavs_GL(hparams, mels, output_dir=""):
 def run(hparams, checkpoint_path, sentence_path, clenaer, output_dir):
     f = open(sentence_path, 'r')
     sentences = [x.strip() for x in f.readlines()]
+    print(sentences)
     f.close()
 
     mels = generate_mels(hparams, checkpoint_path, sentences, clenaer, output_dir)
@@ -101,9 +103,9 @@ if __name__ == '__main__':
     torch.backends.cudnn.enabled = hparams.cudnn_enabled
     torch.backends.cudnn.benchmark = hparams.cudnn_benchmark
 
-    run(hparams, args.checkpoint_path, args.sentence_path, hparams.cleaner, args.output_directory)
+    run(hparams, args.checkpoint_path, args.sentence_path, hparams.text_cleaners, args.output_directory)
     """
     example to run 
-    python inference.py -o=synthesis/5000 -c=nam_h_ep7/checkpoint_5000 -s=test.txt --cleaner='korean_cleaner'
+    python inference.py -o=synthesis/5000 -c=nam_h_ep7/checkpoint_5000 -s=test.txt
     """
 

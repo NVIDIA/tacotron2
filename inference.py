@@ -86,7 +86,9 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--checkpoint_path', type=str, default=None,
                         required=True, help='checkpoint path')
     parser.add_argument('-s', '--sentence_path', type=str, default=None,
-                        required=True, help='checkpoint path')
+                        required=True, help='sentence path')
+    parser.add_argument('--cleaner', type=str, default='english_cleaner',
+                        required=True, help='cleaner')
     parser.add_argument('--hparams', type=str,
                         required=False, help='comma separated name=value pairs')
 
@@ -96,9 +98,10 @@ if __name__ == '__main__':
     hparams.filter_length = 1024
     hparams.hop_length = 256
     hparams.win_length = 1024
-    hparams.sentence_path = args['sentence_path']
 
 
     torch.backends.cudnn.enabled = hparams.cudnn_enabled
     torch.backends.cudnn.benchmark = hparams.cudnn_benchmark
+
+    run(hparams, args.checkpoint_path, args.sentence_path, args.clenaer, args.output_dir)
 

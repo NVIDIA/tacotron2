@@ -20,7 +20,7 @@ def plot_data(data, index, output_dir="", figsize=(16, 4)):
     for i in range(len(data)):
         axes[i].imshow(data[i], aspect='auto', origin='bottom',
                         interpolation='none')
-    plt.savefig(os.path.join(output_dir, 'sentence_{}.png'),format(index))
+    plt.savefig(os.path.join(output_dir, 'sentence_{}.png'.format(index)))
 
 def generate_mels(hparams, checkpoint_path, sentences, cleaner, output_dir=""):
     model = load_model(hparams)
@@ -33,8 +33,7 @@ def generate_mels(hparams, checkpoint_path, sentences, cleaner, output_dir=""):
 
     output_mels = []
     for i, s in enumerate(sentences):
-        sequence = np.array(text_to_sequence(s, [cleaner]))[None, :]
-        print(sequence)
+        sequence = np.array(text_to_sequence(s, cleaner))[None, :]
         sequence = torch.autograd.Variable(torch.from_numpy(sequence)).cuda().long()
 
         stime = time.time()
@@ -42,7 +41,7 @@ def generate_mels(hparams, checkpoint_path, sentences, cleaner, output_dir=""):
         plot_data((mel_outputs_postnet.data.cpu().numpy()[0],
                    alignments.data.cpu().numpy()[0].T), i, output_dir)
         inf_time = time.time() - stime
-        print("{}th sentence, Infenrece time: {:.2f}s, len_mel: {}".format(i, inf_time, mel_outputs_postnet.size(1)))
+        print("{}th sentence, Infenrece time: {:.2f}s, len_mel: {}".format(i, inf_time, mel_outputs_postnet.size(2)))
         output_mels.append(mel_outputs_postnet)
 
     return output_mels
@@ -74,11 +73,11 @@ def mels_to_wavs_GL(hparams, mels, output_dir=""):
 def run(hparams, checkpoint_path, sentence_path, clenaer, output_dir):
     f = open(sentence_path, 'r')
     sentences = [x.strip() for x in f.readlines()]
-    print(sentences)
+    print('All sentences to infer:',sentences)
     f.close()
 
     mels = generate_mels(hparams, checkpoint_path, sentences, clenaer, output_dir)
-    mels_to_wavs_GL(mels)
+    mels_to_wavs_GL(hparams, mels, output_dir)
     pass
 
 if __name__ == '__main__':

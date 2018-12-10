@@ -83,15 +83,13 @@ def warm_start_model(checkpoint_path, model):
 def GTA_Synthesis(output_directory, checkpoint_path, n_gpus,
           rank, group_name, hparams):
     """
-    Params
-    ------
-
-    output_directory (string): directory to save checkpoints
-    log_directory (string) directory to save tensorboard logs
-    checkpoint_path(string): checkpoint path
-    n_gpus (int): number of gpus
-    rank (int): rank of current gpu
-    hparams (object): comma separated list of "name=value" pairs.
+    :param output_directory:
+    :param checkpoint_path:
+    :param n_gpus:
+    :param rank:
+    :param group_name:
+    :param hparams:
+    :return:
     """
     if hparams.distributed_run:
         init_distributed(hparams, n_gpus, rank, group_name)
@@ -133,10 +131,6 @@ def GTA_Synthesis(output_directory, checkpoint_path, n_gpus,
         _, input_lengths, _, _, output_lengths = batch # output_lengths: orgnal mel length
         input_lengths_, ids_sorted_decreasing = torch.sort(torch.LongTensor(len_text_list), dim=0, descending=True)
         ids_sorted_decreasing = ids_sorted_decreasing.numpy() # ids_sorted_decreasing, original index
-
-        # for debugging
-        # print(input_lengths)
-        # print(input_lengths_)
 
         org_audiopaths = [] # orgnal_file_name
         mel_paths = []

@@ -3,7 +3,8 @@ import librosa
 import numpy as np
 
 sr = 22050
-pad_size = int(sr/25)
+#pad_size = int(sr/25)
+pad_size = 768
 max_wav_value=32768.0
 file_list = ['filelists/nam-h_test_filelist.txt', 'filelists/nam-h_train_filelist.txt', 'filelists/nam-h_val_filelist.txt']
 #file_list = ['filelists/ljs_audio_text_test_filelist.txt', 'filelists/ljs_audio_text_train_filelist.txt', 'filelists/ljs_audio_text_val_filelist.txt']

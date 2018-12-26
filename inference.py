@@ -83,7 +83,7 @@ def run(hparams, checkpoint_path, sentence_path, clenaer, output_dir):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', '--output_directory', type=str,
-                        help='directory to save checkpoints')
+                        help='directory to save wave and fig')
     parser.add_argument('-c', '--checkpoint_path', type=str, default=None,
                         required=True, help='checkpoint path')
     parser.add_argument('-s', '--sentence_path', type=str, default=None,

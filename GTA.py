@@ -16,7 +16,9 @@ from fp16_optimizer import FP16_Optimizer
 from model import Tacotron2
 from data_utils import TextMelLoader, TextMelCollate
 from hparams import create_hparams
+from preprocess_audio import silence_audio_size, trim_hop_size
 
+silence_mel_size = silence_audio_size/trim_hop_size
 
 def batchnorm_to_float(module):
     """Converts batch norm modules to FP32"""
@@ -82,15 +84,7 @@ def warm_start_model(checkpoint_path, model):
 
 def GTA_Synthesis(output_directory, checkpoint_path, n_gpus,
           rank, group_name, hparams):
-    """
-    :param output_directory:
-    :param checkpoint_path:
-    :param n_gpus:
-    :param rank:
-    :param group_name:
-    :param hparams:
-    :return:
-    """
+
     if hparams.distributed_run:
         init_distributed(hparams, n_gpus, rank, group_name)
     torch.manual_seed(hparams.seed)
@@ -149,12 +143,14 @@ def GTA_Synthesis(output_directory, checkpoint_path, n_gpus,
             map = "{}|{}\n".format(wav_path,mel_path)
             f.write(map)
 
-            mel = mel_outputs_postnet[k,:,:output_lengths[k]]
+            mel = mel_outputs_postnet[k,:,:output_lengths[k]-silence_mel_size]
             np.save(mel_path, mel)
-        print('compute and save melspectrograms in {}th batch'.format(i))
+        print('compute and save GTA melspectrograms in {}th batch'.format(i))
     f.close()
 
 if __name__ == '__main__':
+    # run example
+    # python GTA.py -o=nam-h -c=nam_h_ep8/checkpoint_50000
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', '--output_directory', type=str,
                         help='directory to save checkpoints')

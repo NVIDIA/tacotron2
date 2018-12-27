@@ -140,7 +140,7 @@ def GTA_Synthesis(output_directory, checkpoint_path, n_gpus,
             f.write(map)
             diff = 0
             if (int(np.ceil(input_lengths[k] / hparams.hop_length)) != output_lengths[k]):
-                print(np.ceil(input_lengths[k] / hparams.hop_length), output_lengths[k]. np.ceil(input_lengths[k] / hparams.hop_length) - output_lengths[k])
+                print(int(np.ceil(input_lengths[k] / hparams.hop_length)), output_lengths[k]. int(np.ceil(input_lengths[k] / hparams.hop_length)) - output_lengths[k])
                 diff = int(np.ceil(input_lengths[k] / hparams.hop_length)) - output_lengths[k]
             mel = mel_outputs_postnet[k,:,:output_lengths[k]-diff]
             np.save(mel_path, mel)

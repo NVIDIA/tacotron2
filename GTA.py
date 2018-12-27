@@ -112,7 +112,6 @@ def GTA_Synthesis(output_directory, checkpoint_path, n_gpus,
         audiopaths_and_text = train_set.audiopaths_and_text[i*hparams.batch_size:i*hparams.batch_size + batch_size]
         audiopaths = [ x[0] for x in audiopaths_and_text] # file name list
 
-
         # get len texts
         indx_list = np.arange(i*hparams.batch_size, i*hparams.batch_size + batch_size).tolist()
         len_text_list = []
@@ -139,8 +138,10 @@ def GTA_Synthesis(output_directory, checkpoint_path, n_gpus,
             mel_path = mel_paths[k]+'.npy'
             map = "{}|{}\n".format(wav_path,mel_path)
             f.write(map)
-
-            mel = mel_outputs_postnet[k,:,:output_lengths[k]]
+            diff = 0
+            if (np.ceil(input_lengths[k] / hparams.hop_length) != output_lengths[k]):
+                diff = np.ceil(input_lengths[k] / hparams.hop_length) - output_lengths[k]
+            mel = mel_outputs_postnet[k,:,:output_lengths[k]-diff]
             np.save(mel_path, mel)
         print('compute and save GTA melspectrograms in {}th batch'.format(i))
     f.close()

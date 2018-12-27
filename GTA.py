@@ -138,10 +138,7 @@ def GTA_Synthesis(output_directory, checkpoint_path, n_gpus,
             mel_path = mel_paths[k]+'.npy'
             map = "{}|{}\n".format(wav_path,mel_path)
             f.write(map)
-            diff = 0
-            if (int(np.ceil(input_lengths[k] / hparams.hop_length)) != output_lengths[k]):
-                print(int(np.ceil(input_lengths[k] / hparams.hop_length)), output_lengths[k]. int(np.ceil(input_lengths[k] / hparams.hop_length)) - output_lengths[k])
-                diff = int(np.ceil(input_lengths[k] / hparams.hop_length)) - output_lengths[k]
+            diff = int(np.ceil(input_lengths[k] / hparams.hop_length)) - output_lengths[k]
             mel = mel_outputs_postnet[k,:,:output_lengths[k]-diff]
             np.save(mel_path, mel)
         print('compute and save GTA melspectrograms in {}th batch'.format(i))

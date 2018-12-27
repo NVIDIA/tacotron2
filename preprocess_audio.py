@@ -1,19 +1,15 @@
 from scipy.io.wavfile import write
 import librosa
 import numpy as np
+import argparse
 
 sr = 22050
 max_wav_value=32768.0
-file_list = ['filelists/nam-h_test_filelist.txt', 'filelists/nam-h_train_filelist.txt', 'filelists/nam-h_val_filelist.txt']
-#file_list = ['filelists/ljs_audio_text_test_filelist.txt', 'filelists/ljs_audio_text_train_filelist.txt', 'filelists/ljs_audio_text_val_filelist.txt']
-# M-AILABS (and other datasets) trim params
 trim_fft_size = 1024
 trim_hop_size = 256
 trim_top_db = 23
-# wav_file = '0000000.wav'
-silence_audio_size = trim_hop_size*3
 
-def run():
+def preprocess_audio(file_list, silence_audio_size):
     for F in file_list:
         f = open(F)
         R = f.readlines()
@@ -33,27 +29,14 @@ def run():
                 print (i)
 
 if __name__ == "__main__":
-    # for test
-    # wav_file = '0000000.wav'
-    # data, sampling_rate = librosa.core.load(wav_file, sr)
-    # data_ = librosa.effects.trim(data, top_db=trim_top_db, frame_length=trim_fft_size, hop_length=trim_hop_size)[0]
-    # print(len(data), len(data_))
-    # write('test1.wav', sampling_rate, data)
-    # write('test2.wav', sampling_rate, data_)
-    #
-    # # for test 2
-    # wav_file = '0000000.wav'
-    # wav_file2 = 'test1.wav'
-    # wav_file3 = 'test2.wav'
-    #
-    # sr1, data1= read(wav_file)
-    # sr2, data2 = read(wav_file2)
-    # sr3, data3 = read(wav_file3)
-    #
-    # print('sr1:{}, sr2:{}, sr3:{}'.format(sr1, sr2, sr3))
-    # print('{} {} {}'.format(len(data1), len(data2), len(data3)))
-    # print('{} {} {}'.format(data1.min(), data2.min(), data3.min()))
-    # print('{} {} {}'.format(data1.max(), data2.max(), data3.max()))
-
-    # for run
-    run()
+    ## usage
+    ## python preprocess_audio.py -f=filelists/nam-h_test_filelist.txt,filelists/nam-h_train_filelist.txt,filelists/nam-h_val_filelist.txt -s=3
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--file_list', type=str,
+                        help='file list to preprocess')
+    parser.add_argument('-s', '--silence_mel_padding', type=int, default=0,
+                        help='silence audio size is hop_length * silence mel padding')
+    args = parser.parse_args()
+    file_list = args.file_list.split(',')
+    silence_audio_size = trim_hop_size * args.silence_mel_padding
+    preprocess_audio(file_list, silence_audio_size)

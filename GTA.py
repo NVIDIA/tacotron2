@@ -16,9 +16,6 @@ from fp16_optimizer import FP16_Optimizer
 from model import Tacotron2
 from data_utils import TextMelLoader, TextMelCollate
 from hparams import create_hparams
-from preprocess_audio import silence_audio_size, trim_hop_size
-
-silence_mel_size = silence_audio_size/trim_hop_size
 
 def batchnorm_to_float(module):
     """Converts batch norm modules to FP32"""
@@ -143,7 +140,7 @@ def GTA_Synthesis(output_directory, checkpoint_path, n_gpus,
             map = "{}|{}\n".format(wav_path,mel_path)
             f.write(map)
 
-            mel = mel_outputs_postnet[k,:,:output_lengths[k]-silence_mel_size]
+            mel = mel_outputs_postnet[k,:,:output_lengths[k]]
             np.save(mel_path, mel)
         print('compute and save GTA melspectrograms in {}th batch'.format(i))
     f.close()

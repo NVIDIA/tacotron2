@@ -22,7 +22,7 @@ def plot_data(data, index, output_dir="", figsize=(16, 4)):
                         interpolation='none')
     plt.savefig(os.path.join(output_dir, 'sentence_{}.png'.format(index)))
 
-def generate_mels(hparams, checkpoint_path, sentences, cleaner, output_dir=""):
+def generate_mels(hparams, checkpoint_path, sentences, cleaner, silence_mel_padding, output_dir=""):
     model = load_model(hparams)
     try:
         model = model.module
@@ -42,7 +42,7 @@ def generate_mels(hparams, checkpoint_path, sentences, cleaner, output_dir=""):
                    alignments.data.cpu().numpy()[0].T), i, output_dir)
         inf_time = time.time() - stime
         print("{}th sentence, Infenrece time: {:.2f}s, len_mel: {}".format(i, inf_time, mel_outputs_postnet.size(2)))
-        output_mels.append(mel_outputs_postnet)
+        output_mels.append(mel_outputs_postnet[:,:,:-silence_mel_padding])
 
     return output_mels
 
@@ -81,6 +81,10 @@ def run(hparams, checkpoint_path, sentence_path, clenaer, output_dir):
     pass
 
 if __name__ == '__main__':
+    """
+    usage
+    python inference.py -o=synthesis/80000 -c=nam_h_ep8/checkpoint_80000 -s=test.txt --silence_mel_padding=3
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', '--output_directory', type=str,
                         help='directory to save wave and fig')
@@ -88,6 +92,8 @@ if __name__ == '__main__':
                         required=True, help='checkpoint path')
     parser.add_argument('-s', '--sentence_path', type=str, default=None,
                         required=True, help='sentence path')
+    parser.add_argument('--silence_mel_padding', type=int, default=0,
+                        help='silence audio size is hop_length * silence mel padding')
     parser.add_argument('--hparams', type=str,
                         required=False, help='comma separated name=value pairs')
 
@@ -98,13 +104,9 @@ if __name__ == '__main__':
     hparams.hop_length = 256
     hparams.win_length = 1024
 
-
     torch.backends.cudnn.enabled = hparams.cudnn_enabled
     torch.backends.cudnn.benchmark = hparams.cudnn_benchmark
 
-    run(hparams, args.checkpoint_path, args.sentence_path, hparams.text_cleaners, args.output_directory)
-    """
-    example to run 
-    python inference.py -o=synthesis/5000 -c=nam_h_ep7/checkpoint_5000 -s=test.txt
-    """
+    run(hparams, args.checkpoint_path, args.sentence_path, hparams.text_cleaners, args.silence_mel_padding ,args.output_directory)
+
 

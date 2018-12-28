@@ -138,8 +138,11 @@ def GTA_Synthesis(output_directory, checkpoint_path, n_gpus,
             mel_path = mel_paths[k]+'.npy'
             map = "{}|{}\n".format(wav_path,mel_path)
             f.write(map)
-            diff = (input_lengths[k] / hparams.hop_length) - output_lengths[k]
+            # To do: size mismatch
+            diff = output_lengths[k] - (input_lengths[k] / hparams.hop_length)
+            diff = diff.data.data.cpu().numpy()
             mel = mel_outputs_postnet[k,:,:output_lengths[k]-diff]
+            if diff != 0: print(wav_path, input_lengths[k], output_lengths[k], mel.shape)
             np.save(mel_path, mel)
         print('compute and save GTA melspectrograms in {}th batch'.format(i))
     f.close()

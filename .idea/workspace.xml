@@ -1,0 +1,952 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list id="80b8e1c4-d6ac-448c-a8af-702a5c76e0a5" name="Revert: Merge branch 'master' into pr/1" comment="" />
+    <list default="true" id="330ef702-2ed5-4d7e-88b9-21b6501ba005" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/GTA.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/filelists/nam-h_test_filelist.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/filelists/nam-h_train_filelist.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/filelists/nam-h_val_filelist.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/inference.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/preprocess_audio.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/text/ko_dictionary.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/text/korean.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/filelists/ljs_audio_text_test_filelist.txt" beforeDir="false" afterPath="$PROJECT_DIR$/filelists/ljs_audio_text_test_filelist.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/filelists/ljs_audio_text_train_filelist.txt" beforeDir="false" afterPath="$PROJECT_DIR$/filelists/ljs_audio_text_train_filelist.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/filelists/ljs_audio_text_val_filelist.txt" beforeDir="false" afterPath="$PROJECT_DIR$/filelists/ljs_audio_text_val_filelist.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hparams.py" beforeDir="false" afterPath="$PROJECT_DIR$/hparams.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/text/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/text/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/text/cleaners.py" beforeDir="false" afterPath="$PROJECT_DIR$/text/cleaners.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/text/symbols.py" beforeDir="false" afterPath="$PROJECT_DIR$/text/symbols.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
+    </list>
+    <list id="c9fb218c-9429-4cdd-bb58-82335a574f5f" name="update comment" comment="" />
+    <list id="e3ae9657-8326-43dd-b7ca-b6b0dff7e952" name="Revert &quot;update comment&quot;" comment="" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="Unnamed">
+      <favorite_root url="file://$PROJECT_DIR$/audio_processing.py" type="psiFile" klass="com.intellij.ide.projectView.impl.nodes.PsiFileNode" />
+      <favorite_root url="file://$PROJECT_DIR$/data_utils.py" type="psiFile" klass="com.intellij.ide.projectView.impl.nodes.PsiFileNode" />
+      <favorite_root url="file://$PROJECT_DIR$/utils.py" type="psiFile" klass="com.intellij.ide.projectView.impl.nodes.PsiFileNode" />
+      <favorite_root url="file://$PROJECT_DIR$/GTA.py" type="psiFile" klass="com.intellij.ide.projectView.impl.nodes.PsiFileNode" />
+      <favorite_root url="file://$PROJECT_DIR$/inference.py" type="psiFile" klass="com.intellij.ide.projectView.impl.nodes.PsiFileNode" />
+      <favorite_root url="file://$PROJECT_DIR$/preprocess_audio.py" type="psiFile" klass="com.intellij.ide.projectView.impl.nodes.PsiFileNode" />
+    </favorites_list>
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="preprocess_audio.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/preprocess_audio.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="242">
+              <caret line="11" column="50" selection-start-line="11" selection-start-column="32" selection-end-line="11" selection-end-column="50" />
+              <folding>
+                <element signature="e#0#34#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="data_utils.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/data_utils.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="390">
+              <caret line="106" column="23" selection-start-line="106" selection-start-column="23" selection-end-line="106" selection-end-column="23" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="symbols.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/text/symbols.py">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/text/__init__.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-440">
+              <caret line="49" column="29" lean-forward="true" selection-start-line="49" selection-start-column="18" selection-end-line="49" selection-end-column="38" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="hparams.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/hparams.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="792">
+              <caret line="36" column="18" selection-start-line="36" selection-start-column="18" selection-end-line="36" selection-end-column="18" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GTA.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/GTA.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="454">
+              <caret line="143" column="66" selection-start-line="143" selection-start-column="66" selection-end-line="143" selection-end-column="66" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="inference.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/inference.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1364">
+              <caret line="62" column="68" selection-start-line="62" selection-start-column="55" selection-end-line="62" selection-end-column="68" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>제 아내는 요리</find>
+      <find>temp</find>
+      <find>prepare_directories_and_logger</find>
+      <find>max_wav_value</find>
+      <find>create_hparams</find>
+      <find>warm_start_model</find>
+      <find>assert</find>
+      <find>is_float_wav</find>
+      <find>sorted</find>
+      <find>DataLoader</find>
+      <find>DistributedSampler</find>
+      <find>prepare_dataloaders</find>
+      <find>ids_sorted_decreasing_</find>
+      <find>parse_batch</find>
+      <find>collate_fn</find>
+      <find>LJ048-0025</find>
+      <find>cleaner</find>
+      <find>print</find>
+      <find>size</find>
+      <find>nam_h_ep7</find>
+      <find>half_sr</find>
+      <find>warms</find>
+      <find>makedir</find>
+      <find>adam</find>
+      <find>pad_size</find>
+      <find>silence_pad_size</find>
+      <find>c</find>
+      <find>|</find>
+      <find>input_lengths_</find>
+      <find>hop</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>ids_sorted_decreasing</replace>
+      <replace>model_LJ</replace>
+      <replace>pad_size</replace>
+      <replace>silence_audio_size</replace>
+    </replaceStrings>
+    <dirStrings>
+      <dir>E:\git\tacotron2</dir>
+    </dirStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="pr/1" />
+      </map>
+    </option>
+    <option name="RESET_MODE" value="MIXED" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/inference.ipynb" />
+        <option value="F:/Data/Audio/Dataset/박보영/park/metadata.csv" />
+        <option value="$PROJECT_DIR$/text/cleaners.py" />
+        <option value="$PROJECT_DIR$/text/symbols.py" />
+        <option value="$PROJECT_DIR$/requirements.txt" />
+        <option value="$PROJECT_DIR$/text/__init__.py" />
+        <option value="$PROJECT_DIR$/text/ko_dictionary.py" />
+        <option value="$PROJECT_DIR$/text/korean.py" />
+        <option value="A:/TEMP/scp19754/home/hwak1234/projects/Tacotron-2/logs-Tacotron-2/taco_pretrained/checkpoint" />
+        <option value="A:/TEMP/scp26375/home/hwak1234/projects/Tacotron-2-mamah/logs-Tacotron-2/taco_pretrained/checkpoint" />
+        <option value="$PROJECT_DIR$/filelists/nam-h_test_filelist.txt" />
+        <option value="$PROJECT_DIR$/filelists/nam-h_val_filelist.txt" />
+        <option value="$PROJECT_DIR$/filelists/nam-h_train_filelist.txt" />
+        <option value="$PROJECT_DIR$/filelists/change_sr.py" />
+        <option value="A:/Temp/scp47556/home/hwak1234/projects/tacotron2/hparams.py" />
+        <option value="A:/Temp/scp02801/home/hwak1234/projects/waveglow/config.json" />
+        <option value="$PROJECT_DIR$/train.py" />
+        <option value="F:/Data/Audio/Dataset/성우/high_quality/metadata.csv" />
+        <option value="A:/Temp/scp02252/home/hwak1234/projects/tacotron2/hparams.py" />
+        <option value="A:/Temp/scp49314/home/hwak1234/projects/tacotron2/inference.py" />
+        <option value="A:/Temp/scp21077/home/hwak1234/projects/tacotron2/test.txt" />
+        <option value="$PROJECT_DIR$/change_sr.py" />
+        <option value="A:/Temp/scp39498/home/hwak1234/projects/tacotron2/inference_test.sh" />
+        <option value="A:/Temp/scp15538/home/hwak1234/projects/tacotron2/inference_test.sh" />
+        <option value="A:/TEMP/scp25324/home/hwak1234/projects/waveglow/eng_test.txt" />
+        <option value="A:/TEMP/scp53313/home/hwak1234/projects/waveglow/kor_test.txt" />
+        <option value="$PROJECT_DIR$/hparams.py" />
+        <option value="$PROJECT_DIR$/utils.py" />
+        <option value="$PROJECT_DIR$/data_utils.py" />
+        <option value="$PROJECT_DIR$/preprocess_audio.py" />
+        <option value="$PROJECT_DIR$/inference.py" />
+        <option value="$PROJECT_DIR$/GTA.py" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-1928" />
+    <option name="y" value="-8" />
+    <option name="width" value="1936" />
+    <option name="height" value="1096" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="tacotron2" type="b2602c69:ProjectViewProjectNode" />
+              <item name="tacotron2" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="tacotron2" type="b2602c69:ProjectViewProjectNode" />
+              <item name="tacotron2" type="462c0819:PsiDirectoryNode" />
+              <item name="text" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="reference.settings.ide.settings.spelling" />
+    <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/hparams.py" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Python.change_sr">
+    <configuration name="__init__" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="tacotron2" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/text" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/text/__init__.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <configuration name="change_sr" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="tacotron2" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="E:\git\tacotron2\preprocess_audio.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.__init__" />
+      <item itemvalue="Python.change_sr" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.change_sr" />
+        <item itemvalue="Python.__init__" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="330ef702-2ed5-4d7e-88b9-21b6501ba005" name="Default" comment="" />
+      <changelist id="80b8e1c4-d6ac-448c-a8af-702a5c76e0a5" name="Revert: Merge branch 'master' into pr/1" comment="" />
+      <changelist id="e3ae9657-8326-43dd-b7ca-b6b0dff7e952" name="Revert &quot;update comment&quot;" comment="" />
+      <changelist id="c9fb218c-9429-4cdd-bb58-82335a574f5f" name="update comment" comment="" />
+      <created>1542677647352</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1542677647352</updated>
+    </task>
+    <task id="LOCAL-00056" summary="Saving normalized wave&#10;Process to learn model without nomalizing wave">
+      <created>1543814969177</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1543814969177</updated>
+    </task>
+    <task id="LOCAL-00057" summary="Saving normalized wave&#10;Process to learn model without nomalizing wave">
+      <created>1543819700086</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1543819700087</updated>
+    </task>
+    <task id="LOCAL-00058" summary="Saving int16 wave, Using int16">
+      <created>1543978615187</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1543978615187</updated>
+    </task>
+    <task id="LOCAL-00059" summary="change iters_per_checkpoint from 500 to 5000">
+      <created>1543990761361</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1543990761361</updated>
+    </task>
+    <task id="LOCAL-00060" summary="add 0.5 silent.">
+      <created>1544074944367</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1544074944368</updated>
+    </task>
+    <task id="LOCAL-00061" summary="update GTA">
+      <created>1544087463311</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1544087463311</updated>
+    </task>
+    <task id="LOCAL-00062" summary="add 0.5 sec silent wav and comment for shape of data.">
+      <created>1544087515384</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1544087515384</updated>
+    </task>
+    <task id="LOCAL-00063" summary="implement GTA">
+      <created>1544088424374</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1544088424374</updated>
+    </task>
+    <task id="LOCAL-00064" summary="implement GTA">
+      <created>1544089032096</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1544089032096</updated>
+    </task>
+    <task id="LOCAL-00065" summary="implement GTA">
+      <created>1544089218370</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1544089218370</updated>
+    </task>
+    <task id="LOCAL-00066" summary="implement GTA">
+      <created>1544146930137</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1544146930137</updated>
+    </task>
+    <task id="LOCAL-00067" summary="implement GTA">
+      <created>1544147105237</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1544147105237</updated>
+    </task>
+    <task id="LOCAL-00068" summary="implement GTA">
+      <created>1544151474134</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1544151474134</updated>
+    </task>
+    <task id="LOCAL-00069" summary="update file_list">
+      <created>1544151535171</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1544151535171</updated>
+    </task>
+    <task id="LOCAL-00070" summary="implement GTA">
+      <created>1544152004537</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1544152004537</updated>
+    </task>
+    <task id="LOCAL-00071" summary="implement GTA">
+      <created>1544153644343</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1544153644343</updated>
+    </task>
+    <task id="LOCAL-00072" summary="implement GTA">
+      <created>1544165722582</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1544165722582</updated>
+    </task>
+    <task id="LOCAL-00073" summary="implement GTA">
+      <created>1544165891435</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1544165891435</updated>
+    </task>
+    <task id="LOCAL-00074" summary="implement GTA">
+      <created>1544167169488</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1544167169489</updated>
+    </task>
+    <task id="LOCAL-00075" summary="implement GTA">
+      <created>1544168124253</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1544168124253</updated>
+    </task>
+    <task id="LOCAL-00076" summary="implement GTA">
+      <created>1544429775860</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1544429775860</updated>
+    </task>
+    <task id="LOCAL-00077" summary="Update inference scheme">
+      <created>1544429802410</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1544429802410</updated>
+    </task>
+    <task id="LOCAL-00078" summary="Update inference scheme">
+      <created>1544430673747</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1544430673747</updated>
+    </task>
+    <task id="LOCAL-00079" summary="Update inference scheme">
+      <created>1544430742742</created>
+      <option name="number" value="00079" />
+      <option name="presentableId" value="LOCAL-00079" />
+      <option name="project" value="LOCAL" />
+      <updated>1544430742742</updated>
+    </task>
+    <task id="LOCAL-00080" summary="Update inference scheme">
+      <created>1544430791062</created>
+      <option name="number" value="00080" />
+      <option name="presentableId" value="LOCAL-00080" />
+      <option name="project" value="LOCAL" />
+      <updated>1544430791062</updated>
+    </task>
+    <task id="LOCAL-00081" summary="Update inference scheme">
+      <created>1544430859495</created>
+      <option name="number" value="00081" />
+      <option name="presentableId" value="LOCAL-00081" />
+      <option name="project" value="LOCAL" />
+      <updated>1544430859495</updated>
+    </task>
+    <task id="LOCAL-00082" summary="Update inference scheme">
+      <created>1544431467746</created>
+      <option name="number" value="00082" />
+      <option name="presentableId" value="LOCAL-00082" />
+      <option name="project" value="LOCAL" />
+      <updated>1544431467746</updated>
+    </task>
+    <task id="LOCAL-00083" summary="update pad_sze">
+      <created>1544435417202</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1544435417202</updated>
+    </task>
+    <task id="LOCAL-00084" summary="update pad_sze">
+      <created>1544435655525</created>
+      <option name="number" value="00084" />
+      <option name="presentableId" value="LOCAL-00084" />
+      <option name="project" value="LOCAL" />
+      <updated>1544435655525</updated>
+    </task>
+    <task id="LOCAL-00085" summary="update pad_size">
+      <created>1545806004685</created>
+      <option name="number" value="00085" />
+      <option name="presentableId" value="LOCAL-00085" />
+      <option name="project" value="LOCAL" />
+      <updated>1545806004686</updated>
+    </task>
+    <task id="LOCAL-00086" summary="update argument help">
+      <created>1545807179565</created>
+      <option name="number" value="00086" />
+      <option name="presentableId" value="LOCAL-00086" />
+      <option name="project" value="LOCAL" />
+      <updated>1545807179565</updated>
+    </task>
+    <task id="LOCAL-00087" summary="update silence padding parameters">
+      <created>1545807256284</created>
+      <option name="number" value="00087" />
+      <option name="presentableId" value="LOCAL-00087" />
+      <option name="project" value="LOCAL" />
+      <updated>1545807256284</updated>
+    </task>
+    <task id="LOCAL-00088" summary="resolve conflict">
+      <created>1545811510656</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1545811510656</updated>
+    </task>
+    <task id="LOCAL-00089" summary="resolve conflict">
+      <created>1545812569417</created>
+      <option name="number" value="00089" />
+      <option name="presentableId" value="LOCAL-00089" />
+      <option name="project" value="LOCAL" />
+      <updated>1545812569417</updated>
+    </task>
+    <task id="LOCAL-00001" summary="update comment">
+      <created>1545814654341</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1545814654341</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Remove silence padding information">
+      <created>1545877142251</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1545877142251</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Remove silence padding information">
+      <created>1545878628003</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1545878628003</updated>
+    </task>
+    <task id="LOCAL-00004" summary="update preprocess scheme">
+      <created>1545878787126</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1545878787126</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Revert &quot;update comment&quot;&#10;&#10;This reverts commit 7860804">
+      <created>1545879120924</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1545879120924</updated>
+    </task>
+    <task id="LOCAL-00006" summary="update preprocess scheme">
+      <created>1545879219679</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1545879219679</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Remove silence padding information">
+      <created>1545879241479</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1545879241481</updated>
+    </task>
+    <task id="LOCAL-00008" summary="update usage example">
+      <created>1545879874890</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1545879874890</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Add an agrument (silence mel padding)">
+      <created>1545879916631</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1545879916631</updated>
+    </task>
+    <task id="LOCAL-00010" summary="match mel size">
+      <created>1545897734742</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1545897734742</updated>
+    </task>
+    <task id="LOCAL-00011" summary="match mel size">
+      <created>1545898182326</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1545898182326</updated>
+    </task>
+    <task id="LOCAL-00012" summary="match mel size">
+      <created>1545898334005</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1545898334005</updated>
+    </task>
+    <task id="LOCAL-00013" summary="match mel size">
+      <created>1545898629890</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1545898629890</updated>
+    </task>
+    <task id="LOCAL-00014" summary="match mel size">
+      <created>1545898711749</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1545898711749</updated>
+    </task>
+    <task id="LOCAL-00015" summary="match mel size">
+      <created>1545966547300</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1545966547300</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-1928" y="-8" width="1936" height="1096" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.12750264" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.5089568" side_tool="true" weight="0.35281384" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.31493506" />
+      <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49789253" visible="true" weight="0.28941908" />
+      <window_info anchor="bottom" id="Python Console" order="11" sideWeight="0.4910432" weight="0.3874459" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.49841937" weight="0.32900432" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="bottom" id="Messages" order="7" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="1" />
+    </layout>
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ORDER">
+      <list>
+        <option value="0" />
+        <option value="2" />
+        <option value="3" />
+        <option value="1" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="RECENTLY_FILTERED_USER_GROUPS">
+                <collection />
+              </option>
+              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+                <collection />
+              </option>
+              <option name="COLUMN_ORDER">
+                <list>
+                  <option value="0" />
+                  <option value="1" />
+                  <option value="2" />
+                  <option value="3" />
+                </list>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="update wave loader" />
+    <MESSAGE value="pre-processing (change sr)" />
+    <MESSAGE value="korean train test" />
+    <MESSAGE value="add Trim" />
+    <MESSAGE value="Saving normalized wave&#10;Process to learn model without nomalizing wave" />
+    <MESSAGE value="Saving int16 wave, Using int16" />
+    <MESSAGE value="change iters_per_checkpoint from 500 to 5000" />
+    <MESSAGE value="add 0.5 silent." />
+    <MESSAGE value="update GTA" />
+    <MESSAGE value="add 0.5 sec silent wav and comment for shape of data." />
+    <MESSAGE value="update file_list" />
+    <MESSAGE value="implement GTA" />
+    <MESSAGE value="Update inference scheme" />
+    <MESSAGE value="update pad_sze" />
+    <MESSAGE value="update pad_size" />
+    <MESSAGE value="update argument help" />
+    <MESSAGE value="update silence padding parameters" />
+    <MESSAGE value="resolve conflict" />
+    <MESSAGE value="update comment" />
+    <MESSAGE value="Revert &quot;update comment&quot;&#10;&#10;This reverts commit 7860804" />
+    <MESSAGE value="update preprocess scheme" />
+    <MESSAGE value="Remove silence padding information" />
+    <MESSAGE value="update usage example" />
+    <MESSAGE value="Add an agrument (silence mel padding)" />
+    <MESSAGE value="match mel size" />
+    <option name="LAST_COMMIT_MESSAGE" value="match mel size" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://A:/TEMP/scp39843/home/hwak1234/projects/Tacotron-2-mamah/synthesize.py" />
+    <entry file="file://A:/TEMP/scp40888/home/hwak1234/projects/Tacotron-2-mamah/hparams.py" />
+    <entry file="file://A:/TEMP/scp58821/home/hwak1234/projects/flask-server/tacorn_synthesis.sh" />
+    <entry file="file://A:/TEMP/scp19754/home/hwak1234/projects/Tacotron-2/logs-Tacotron-2/taco_pretrained/checkpoint" />
+    <entry file="file://A:/TEMP/scp15577/home/hwak1234/projects/Tacotron-2/hparams.py" />
+    <entry file="file://A:/TEMP/scp27879/home/hwak1234/projects/Tacotron-2/synthesize.py" />
+    <entry file="file://A:/TEMP/scp29987/home/hwak1234/projects/tacorn_org/synthesize.py" />
+    <entry file="file://A:/TEMP/scp58597/home/hwak1234/projects/flask-server/main.py" />
+    <entry file="file://A:/TEMP/scp15148/home/hwak1234/projects/Tacotron-2-mamah/hparams.py" />
+    <entry file="file://A:/TEMP/scp26375/home/hwak1234/projects/Tacotron-2-mamah/logs-Tacotron-2/taco_pretrained/checkpoint" />
+    <entry file="file://$PROJECT_DIR$/filelists/nam-h_val_filelist.txt" />
+    <entry file="file://A:/Temp/scp16617/home/hwak1234/projects/tacotron2/filelists/nam-h_test_filelist.txt" />
+    <entry file="file://$PROJECT_DIR$/stft.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2563" />
+      </provider>
+    </entry>
+    <entry file="file://C:/ProgramData/Miniconda3/envs/py36/Lib/site-packages/scipy/io/wavfile.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="201">
+          <caret line="308" column="60" lean-forward="true" selection-start-line="308" selection-start-column="60" selection-end-line="308" selection-end-column="60" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/filelists/nam-h_test_filelist.txt" />
+    <entry file="file://$PROJECT_DIR$/filelists/ljs_audio_text_test_filelist.txt">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://A:/Temp/scp47556/home/hwak1234/projects/tacotron2/hparams.py" />
+    <entry file="file://$PROJECT_DIR$/filelists/ljs_audio_text_train_filelist.txt">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/filelists/nam-h_train_filelist.txt" />
+    <entry file="file://A:/Temp/scp02801/home/hwak1234/projects/waveglow/config.json" />
+    <entry file="file://F:/Data/Audio/Dataset/성우/high_quality/metadata.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="549" column="21" selection-start-line="549" selection-start-column="21" selection-end-line="549" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/layers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1518">
+          <caret line="73" column="38" lean-forward="true" selection-start-line="73" selection-start-column="38" selection-end-line="73" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="472" column="52" lean-forward="true" selection-start-line="472" selection-start-column="52" selection-end-line="472" selection-end-column="52" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://A:/Temp/scp40515/home/hwak1234/projects/tacotron2/LJSpeech-1.1/map.txt" />
+    <entry file="file://A:/Temp/scp02252/home/hwak1234/projects/tacotron2/hparams.py" />
+    <entry file="file://$PROJECT_DIR$/../waveglow/train.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://A:/Temp/scp14781/home/hwak1234/projects/tacotron2/hparams.py" />
+    <entry file="file://A:/Temp/scp39498/home/hwak1234/projects/tacotron2/inference_test.sh" />
+    <entry file="file://A:/Temp/scp49314/home/hwak1234/projects/tacotron2/inference.py" />
+    <entry file="file://H:/park_작업완료/review.csv" />
+    <entry file="file://$PROJECT_DIR$/text/korean.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="245">
+          <caret line="149" column="96" lean-forward="true" selection-start-line="149" selection-start-column="96" selection-end-line="149" selection-end-column="96" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://A:/Temp/scp21077/home/hwak1234/projects/tacotron2/test.txt" />
+    <entry file="file://A:/TEMP/scp15538/home/hwak1234/projects/tacotron2/inference_test.sh" />
+    <entry file="file://A:/TEMP/scp25324/home/hwak1234/projects/waveglow/eng_test.txt" />
+    <entry file="file://A:/TEMP/scp53313/home/hwak1234/projects/waveglow/kor_test.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="42" selection-start-column="42" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../Tacotron-2/hparams.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="469">
+          <caret line="204" column="79" selection-start-line="204" selection-start-column="5" selection-end-line="204" selection-end-column="79" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/inference.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/distributed.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/train.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-131">
+          <caret line="246" column="63" lean-forward="true" selection-start-line="246" selection-start-column="63" selection-end-line="246" selection-end-column="63" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="11" column="15" lean-forward="true" selection-start-line="11" selection-start-column="15" selection-end-line="11" selection-end-column="15" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/audio_processing.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1738">
+          <caret line="82" column="7" lean-forward="true" selection-start-line="82" selection-start-column="7" selection-end-line="82" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/inference.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1364">
+          <caret line="62" column="68" selection-start-line="62" selection-start-column="55" selection-end-line="62" selection-end-column="68" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/preprocess_audio.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="242">
+          <caret line="11" column="50" selection-start-line="11" selection-start-column="32" selection-end-line="11" selection-end-column="50" />
+          <folding>
+            <element signature="e#0#34#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hparams.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="792">
+          <caret line="36" column="18" selection-start-line="36" selection-start-column="18" selection-end-line="36" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://F:/Data/Audio/실험/1226/kor/로그/GPU_1.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="22">
+          <caret line="6" column="16" lean-forward="true" selection-start-line="6" selection-start-column="16" selection-end-line="6" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://A:/TEMP/scp45995/home/hwak1234/projects/waveglow/256-gpu8-state3/GPU_1.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="132">
+          <caret line="1109" column="20" selection-start-line="1109" selection-start-column="20" selection-end-line="1109" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GTA.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="454">
+          <caret line="143" column="66" selection-start-line="143" selection-start-column="66" selection-end-line="143" selection-end-column="66" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data_utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="106" column="23" selection-start-line="106" selection-start-column="23" selection-end-line="106" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/text/symbols.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/text/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-440">
+          <caret line="49" column="29" lean-forward="true" selection-start-line="49" selection-start-column="18" selection-end-line="49" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

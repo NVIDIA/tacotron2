@@ -1,7 +1,9 @@
 import numpy as np
 from scipy.io.wavfile import read
+import librosa
 import torch
 
+max_wav_value=32768.0
 
 def get_mask_from_lengths(lengths):
     max_len = torch.max(lengths).item()

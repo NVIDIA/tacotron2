@@ -1,6 +1,4 @@
 import tensorflow as tf
-from text import symbols
-
 
 def create_hparams(hparams_string=None, verbose=False):
     """Create model hyperparameters. Parse nondefault from given string."""
@@ -10,11 +8,12 @@ def create_hparams(hparams_string=None, verbose=False):
         # Experiment Parameters        #
         ################################
         epochs=500,
-        iters_per_checkpoint=1000,
+        iters_per_checkpoint=5000,
         seed=1234,
         dynamic_loss_scaling=True,
-        fp16_run=False,
+        fp16_run=True,
         distributed_run=False,
+
         dist_backend="nccl",
         dist_url="tcp://localhost:54321",
         cudnn_enabled=True,
@@ -24,9 +23,10 @@ def create_hparams(hparams_string=None, verbose=False):
         # Data Parameters             #
         ################################
         load_mel_from_disk=False,
-        training_files='filelists/ljs_audio_text_train_filelist.txt',
-        validation_files='filelists/ljs_audio_text_val_filelist.txt',
-        text_cleaners=['english_cleaners'],
+        training_files='filelists/nam-h_train_filelist.txt',
+        validation_files='filelists/nam-h_val_filelist.txt',
+        text_cleaners=['korean_cleaners'], # english_cleaners, korean_cleaners
+        sort_by_length=False,
 
         ################################
         # Audio Parameters             #
@@ -34,8 +34,8 @@ def create_hparams(hparams_string=None, verbose=False):
         max_wav_value=32768.0,
         sampling_rate=22050,
         filter_length=1024,
-        hop_length=256,
-        win_length=1024,
+        hop_length=256, # number audio of frames between stft colmns, default win_length/4
+        win_length=1024, # win_length int <= n_ftt: fft window size (frequency domain), defaults to win_length = n_fft
         n_mel_channels=80,
         mel_fmin=0.0,
         mel_fmax=8000.0,
@@ -43,7 +43,7 @@ def create_hparams(hparams_string=None, verbose=False):
         ################################
         # Model Parameters             #
         ################################
-        n_symbols=len(symbols),
+        n_symbols = 80, # set 80 if u use korean_cleaners. set 149 if u use english_cleaners
         symbols_embedding_dim=512,
 
         # Encoder parameters

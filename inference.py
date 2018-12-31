@@ -70,13 +70,13 @@ def mels_to_wavs_GL(hparams, mels, output_dir=""):
         print(str)
         write(os.path.join(output_dir,"sentence_{}.wav".format(i)), hparams.sampling_rate, waveform)
 
-def run(hparams, checkpoint_path, sentence_path, clenaer, output_dir):
+def run(hparams, checkpoint_path, sentence_path, clenaer, silence_mel_padding, output_dir):
     f = open(sentence_path, 'r')
     sentences = [x.strip() for x in f.readlines()]
     print('All sentences to infer:',sentences)
     f.close()
 
-    mels = generate_mels(hparams, checkpoint_path, sentences, clenaer, output_dir)
+    mels = generate_mels(hparams, checkpoint_path, sentences, clenaer, silence_mel_padding, output_dir)
     mels_to_wavs_GL(hparams, mels, output_dir)
     pass
 
@@ -84,6 +84,7 @@ if __name__ == '__main__':
     """
     usage
     python inference.py -o=synthesis/80000 -c=nam_h_ep8/checkpoint_80000 -s=test.txt --silence_mel_padding=3
+    python inference.py -o=synthesis -c=tacotron2_statedict.pt -s=test.txt --silence_mel_padding=3
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', '--output_directory', type=str,

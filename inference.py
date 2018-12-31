@@ -60,7 +60,7 @@ def mels_to_wavs_GL(hparams, mels, output_dir=""):
         spec_from_mel = spec_from_mel.transpose(0, 1).unsqueeze(0)
         spec_from_mel = spec_from_mel * spec_from_mel_scaling
 
-        waveform = griffin_lim(torch.autograd.Variable(spec_from_mel[:, :, :-1]),
+        waveform = griffin_lim(torch.autograd.Variable(spec_from_mel[:, :, :]),
                                taco_stft.stft_fn, 60)
         waveform = waveform[0].data.cpu().numpy()
         dec_time = time.time() - stime

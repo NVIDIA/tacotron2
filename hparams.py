@@ -11,7 +11,7 @@ def create_hparams(hparams_string=None, verbose=False):
         iters_per_checkpoint=5000,
         seed=1234,
         dynamic_loss_scaling=True,
-        fp16_run=True,
+        fp16_run=False,
         distributed_run=False,
 
         dist_backend="nccl",

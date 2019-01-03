@@ -32,7 +32,6 @@ if __name__ == "__main__":
     """
     usage
     python preprocess_audio.py -f=filelists/nam-h_test_filelist.txt,filelists/nam-h_train_filelist.txt,filelists/nam-h_val_filelist.txt -s=3
-    python preprocess_audio.py -f=filelists/ljs_audio_text_test_filelist.txt,filelists/ljs_audio_text_train_filelist.txt,filelists/ljs_audio_text_val_filelist.txt -s=3
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--file_list', type=str,

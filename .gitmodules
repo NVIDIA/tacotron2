@@ -1,4 +1,4 @@
 [submodule "waveglow"]
 	path = waveglow
-	url = https://github.com/Yeongtae/tacotron2
+	url = https://github.com/Yeongtae/waveglow
 	branch = master

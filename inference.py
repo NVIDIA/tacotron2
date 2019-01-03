@@ -84,7 +84,7 @@ if __name__ == '__main__':
     """
     usage
     python inference.py -o=synthesis/80000 -c=nam_h_ep8/checkpoint_80000 -s=test.txt --silence_mel_padding=3
-    python inference.py -o=synthesis -c=tacotron2_statedict.pt -s=eng_test.txt --silence_mel_padding=3
+    python inference.py -o=synthesis -c=tacotron2_statedict.pt -s=test.txt --silence_mel_padding=3
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', '--output_directory', type=str,

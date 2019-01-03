@@ -1,4 +1,4 @@
 [submodule "waveglow"]
 	path = waveglow
-	url = https://github.com/NVIDIA/waveglow
+	url = https://github.com/Yeongtae/tacotron2
 	branch = master

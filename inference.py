@@ -60,7 +60,7 @@ def mels_to_wavs_GL(hparams, mels, output_dir=""):
         spec_from_mel = spec_from_mel.transpose(0, 1).unsqueeze(0)
         spec_from_mel = spec_from_mel * spec_from_mel_scaling
 
-        waveform = griffin_lim(torch.autograd.Variable(spec_from_mel[:, :, :-1]),
+        waveform = griffin_lim(torch.autograd.Variable(spec_from_mel[:, :, :]),
                                taco_stft.stft_fn, 60)
         waveform = waveform[0].data.cpu().numpy()
         dec_time = time.time() - stime
@@ -70,13 +70,13 @@ def mels_to_wavs_GL(hparams, mels, output_dir=""):
         print(str)
         write(os.path.join(output_dir,"sentence_{}.wav".format(i)), hparams.sampling_rate, waveform)
 
-def run(hparams, checkpoint_path, sentence_path, clenaer, output_dir):
+def run(hparams, checkpoint_path, sentence_path, clenaer, silence_mel_padding, output_dir):
     f = open(sentence_path, 'r')
     sentences = [x.strip() for x in f.readlines()]
     print('All sentences to infer:',sentences)
     f.close()
 
-    mels = generate_mels(hparams, checkpoint_path, sentences, clenaer, output_dir)
+    mels = generate_mels(hparams, checkpoint_path, sentences, clenaer, silence_mel_padding, output_dir)
     mels_to_wavs_GL(hparams, mels, output_dir)
     pass
 
@@ -84,6 +84,7 @@ if __name__ == '__main__':
     """
     usage
     python inference.py -o=synthesis/80000 -c=nam_h_ep8/checkpoint_80000 -s=test.txt --silence_mel_padding=3
+    python inference.py -o=synthesis -c=tacotron2_statedict.pt -s=eng_test.txt --silence_mel_padding=3
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', '--output_directory', type=str,

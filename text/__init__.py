@@ -56,7 +56,7 @@ def text_to_sequence(text, cleaner_names):
       print(text)
       exit()
   # Append EOS token
-  # sequence.append(_symbol_to_id['~'])
+  if cleaner_names == ["korean_cleaners"]: sequence.append(_symbol_to_id['~'])
   return sequence
 
 

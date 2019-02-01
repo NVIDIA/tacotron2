@@ -28,6 +28,15 @@ def batchnorm_to_float(module):
     return module
 
 
+def lstmcell_to_float(module):
+    """Converts LSTMCell modules to FP32"""
+    if isinstance(module, torch.nn.LSTMCell):
+        module.float()
+    for child in module.children():
+        lstmcell_to_float(child)
+    return module
+
+
 def reduce_tensor(tensor, n_gpus):
     rt = tensor.clone()
     dist.all_reduce(rt, op=dist.reduce_op.SUM)
@@ -81,6 +90,7 @@ def load_model(hparams):
     model = Tacotron2(hparams).cuda()
     if hparams.fp16_run:
         model = batchnorm_to_float(model.half())
+        model = lstmcell_to_float(model)
         model.decoder.attention_layer.score_mask_value = float(finfo('float16').min)
 
     if hparams.distributed_run:

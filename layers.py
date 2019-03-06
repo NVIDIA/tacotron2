@@ -1,7 +1,6 @@
 import torch
 from librosa.filters import mel as librosa_mel_fn
-from audio_processing import dynamic_range_compression
-from audio_processing import dynamic_range_decompression
+from audio_processing import dynamic_range_compression, dynamic_range_decompression, mel_normalize, mel_denormalize
 from stft import STFT
 
 
@@ -60,7 +59,7 @@ class TacotronSTFT(torch.nn.Module):
         output = dynamic_range_decompression(magnitudes)
         return output
 
-    def mel_spectrogram(self, y):
+    def mel_spectrogram(self, y, ref_level_db = 20, magnitude_power=1.5):
         """Computes mel-spectrograms from a batch of waves
         PARAMS
         ------
@@ -73,8 +72,18 @@ class TacotronSTFT(torch.nn.Module):
         assert(torch.min(y.data) >= -1)
         assert(torch.max(y.data) <= 1)
 
+        #print('y' ,y.max(), y.mean(), y.min())
         magnitudes, phases = self.stft_fn.transform(y)
         magnitudes = magnitudes.data
-        mel_output = torch.matmul(self.mel_basis, magnitudes)
-        mel_output = self.spectral_normalize(mel_output)
+        #print('stft_fn', magnitudes.max(), magnitudes.mean(), magnitudes.min())
+        mel_output = torch.matmul(self.mel_basis, torch.abs(magnitudes)**magnitude_power)
+        #print('_linear_to_mel', mel_output.max(), mel_output.mean(), mel_output.min())
+        mel_output = self.spectral_normalize(mel_output) - ref_level_db
+        #print('_amp_to_db', mel_output.max(), mel_output.mean(), mel_output.min())
+        mel_output = mel_normalize(mel_output)
+        #print('_normalize', mel_output.max(), mel_output.mean(), mel_output.min())
+        #spec = mel_denormalize(mel_output)
+        #print('_denormalize', spec.max(), spec.mean(), spec.min())
+        #spec = self.spectral_de_normalize(spec + ref_level_db)**(1/magnitude_power)
+        #print('db_to_amp', spec.max(), spec.mean(), spec.min())
         return mel_output

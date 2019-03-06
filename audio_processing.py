@@ -74,20 +74,26 @@ def griffin_lim(magnitudes, stft_fn, n_iters=30):
         signal = stft_fn.inverse(magnitudes, angles).squeeze(1)
     return signal
 
+def mel_normalize(x, max_abs_value=4.0, min_level_db=-100):
+    return torch.clamp((2*max_abs_value)*(x - min_level_db)/(-min_level_db) - max_abs_value,
+                       min=-max_abs_value, max = max_abs_value)
 
-def dynamic_range_compression(x, C=1, clip_val=1e-5):
+def mel_denormalize(x, max_abs_value=4.0, min_level_db=-100):
+    return (torch.clamp(x, min=-max_abs_value, max = max_abs_value) + max_abs_value)*(-min_level_db)/(2*max_abs_value) + min_level_db
+
+def dynamic_range_compression(x, C=20, clip_val=1e-5):
     """
     PARAMS
     ------
     C: compression factor
     """
-    return torch.log(torch.clamp(x, min=clip_val) * C)
+    return torch.log10(torch.clamp(x, min=clip_val)) * C
 
 
-def dynamic_range_decompression(x, C=1):
+def dynamic_range_decompression(x, C=20):
     """
     PARAMS
     ------
     C: compression factor used to compress
     """
-    return torch.exp(x) / C
+    return torch.pow(10, x/C)

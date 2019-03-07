@@ -51,8 +51,7 @@ def mels_to_wavs_GL(hparams, mels, taco_stft, output_dir="", ref_level_db = 0, m
         mel_decompress = mel_denormalize(mel)
         mel_decompress = taco_stft.spectral_de_normalize(mel_decompress + ref_level_db) ** (1/magnitude_power)
         mel_decompress_ = mel_decompress.transpose(1, 2).data.cpu()
-        mel_decompress = mel_decompress.data.cpu().numpy()
-        print(mel_decompress.shape)
+        mel = mel.data.cpu().numpy()
         spec_from_mel_scaling = 1000
         spec_from_mel = torch.mm(mel_decompress_[0], taco_stft.mel_basis)
         spec_from_mel = spec_from_mel.transpose(0, 1).unsqueeze(0)
@@ -65,7 +64,7 @@ def mels_to_wavs_GL(hparams, mels, taco_stft, output_dir="", ref_level_db = 0, m
         str = "{}th sentence, audio length: {:.2f} sec,  mel_to_wave time: {:.2f}".format(i, len_audio, dec_time)
         print(str)
         write(os.path.join(output_dir,"sentence_{}.wav".format(i)), hparams.sampling_rate, waveform)
-        np.save(os.path.join(output_dir,"mel_{}.npy".format(i)), mel_decompress)
+        np.save(os.path.join(output_dir,"mel_{}.npy".format(i)), mel)
 
 def run(hparams, checkpoint_path, sentence_path, clenaer, silence_mel_padding, output_dir):
     f = open(sentence_path, 'r')

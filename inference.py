@@ -65,7 +65,7 @@ def mels_to_wavs_GL(hparams, mels, taco_stft, output_dir="", ref_level_db = 0, m
         str = "{}th sentence, audio length: {:.2f} sec,  mel_to_wave time: {:.2f}".format(i, len_audio, dec_time)
         print(str)
         write(os.path.join(output_dir,"sentence_{}.wav".format(i)), hparams.sampling_rate, waveform)
-        np.save(os.path.join(output_dir,"mel_{}.wav".format(i)), mel_decompress)
+        np.save(os.path.join(output_dir,"mel_{}.npy".format(i)), mel_decompress)
 
 def run(hparams, checkpoint_path, sentence_path, clenaer, silence_mel_padding, output_dir):
     f = open(sentence_path, 'r')
@@ -95,7 +95,7 @@ if __name__ == '__main__':
                         required=True, help='checkpoint path')
     parser.add_argument('-s', '--sentence_path', type=str, default=None,
                         required=True, help='sentence path')
-    parser.add_argument('--silence_mel_padding', type=int, default=0,
+    parser.add_argument('--silence_mel_padding', type=int, default=1,
                         help='silence audio size is hop_length * silence mel padding')
     parser.add_argument('--hparams', type=str,
                         required=False, help='comma separated name=value pairs')

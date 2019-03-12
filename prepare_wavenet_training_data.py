@@ -118,7 +118,7 @@ def prepare_wavenet_training_data(hparams, out_dir, dataset):
         # print(audio.shape, audio.max(), audio.min())
         mel = get_mel(stft, audio)
         mels.append(mel)
-        print(mel.shape, mel.max(), mel.min())
+        #print(mel.shape, mel.max(), mel.min())
 
         audio = audio.data.cpu().numpy()
         diff = len(audio) - hparams.hop_length * mel.size(0)
@@ -133,6 +133,8 @@ def prepare_wavenet_training_data(hparams, out_dir, dataset):
         mu = mulaw_quantize(audio)
         mus.append(mu)
         # print(mu.shape, mu.max(), mu.min())
+        if (i%100 == 0):
+            print(i)
 
     save(out_dir, sentences, mels, mus)
 
@@ -141,6 +143,7 @@ def prepare_wavenet_training_data(hparams, out_dir, dataset):
 if __name__ == "__main__":
     """
     usage
+    python prepare_wavenet_training_data.py --dataset=nam-h --out_dir=training_data
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--dataset', type=str,

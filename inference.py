@@ -64,13 +64,16 @@ def mels_to_wavs_GL(hparams, mels, taco_stft, output_dir="", ref_level_db = 0, m
         str = "{}th sentence, audio length: {:.2f} sec,  mel_to_wave time: {:.2f}".format(i, len_audio, dec_time)
         print(str)
         write(os.path.join(output_dir,"sentence_{}.wav".format(i)), hparams.sampling_rate, waveform)
-        np.save(os.path.join(output_dir,"mel_{}.npy".format(i)), mel)
 
-def run(hparams, checkpoint_path, sentence_path, clenaer, silence_mel_padding, output_dir):
+def run(hparams, checkpoint_path, sentence_path, clenaer, silence_mel_padding, is_melout, is_metaout, output_dir):
     f = open(sentence_path, 'r')
     sentences = [x.strip() for x in f.readlines()]
     print('All sentences to infer:',sentences)
     f.close()
+
+    if (is_melout):
+        mel_dir = os.path.join(output_dir, 'mels')
+        os.makedirs(mel_dir, exist_ok=True)
 
     stft = TacotronSTFT(
         hparams.filter_length, hparams.hop_length, hparams.win_length,
@@ -78,14 +81,32 @@ def run(hparams, checkpoint_path, sentence_path, clenaer, silence_mel_padding, o
         hparams.mel_fmax)
 
     mels = generate_mels(hparams, checkpoint_path, sentences, clenaer, silence_mel_padding, output_dir)
-    mels_to_wavs_GL(hparams, mels, stft, output_dir)
-    pass
+    mels_to_wavs_GL(hparams, mels, stft, is_melout, output_dir)
+
+    mel_paths = []
+    if is_melout:
+        for i, mel in enumerate(mels):
+            mel_path = os.path.join(output_dir, 'mels/', "mel_{}.npy".format(i))
+            np.save(mel_path, mel)
+            mel_paths.append(mel_path)
+
+    if is_metaout:
+        if(len(mel_paths) != len(sentences)):
+            print('num_mels is not match with num_sentences')
+        else:
+            with open(os.path.join(output_dir, 'metadata.csv'), 'w', encoding='utf-8') as file:
+                lines = []
+                for i, s in enumerate(sentences):
+                    mel_path = mel_paths[i]
+                    lines.append('{}|{}\n'.format(s,mel_path))
+                file.writelines(lines)
 
 if __name__ == '__main__':
     """
     usage
     python inference.py -o=synthesis/80000 -c=nam_h_ep8/checkpoint_80000 -s=test.txt --silence_mel_padding=3
     python inference.py -o=synthesis -c=tacotron2_statedict.pt -s=test.txt --silence_mel_padding=3
+    python inference.py -o=kss_inference_mel -c=kss_model/checkpoint_80000 -s=test.txt --silence_mel_padding=3 --is_melout
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', '--output_directory', type=str,
@@ -98,6 +119,10 @@ if __name__ == '__main__':
                         help='silence audio size is hop_length * silence mel padding')
     parser.add_argument('--hparams', type=str,
                         required=False, help='comma separated name=value pairs')
+    parser.add_argument('--is_melout', type=bool,
+                        default=False, help='Whether to save melspectrogram file or not ')
+    parser.add_argument('--is_metaout', type=bool,
+                        default=False, help='Whether to save metadata.csv file for (mel, text) tuple or not ')
 
     args = parser.parse_args()
     hparams = create_hparams(args.hparams)
@@ -109,6 +134,6 @@ if __name__ == '__main__':
     torch.backends.cudnn.enabled = hparams.cudnn_enabled
     torch.backends.cudnn.benchmark = hparams.cudnn_benchmark
 
-    run(hparams, args.checkpoint_path, args.sentence_path, hparams.text_cleaners, args.silence_mel_padding ,args.output_directory)
+    run(hparams, args.checkpoint_path, args.sentence_path, hparams.text_cleaners, args.silence_mel_padding, args.is_melout, args.is_metaout, args.output_directory)
 
 

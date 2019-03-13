@@ -27,7 +27,6 @@ def get_mel(stft, audio):
     audio_norm = torch.autograd.Variable(audio_norm, requires_grad=False)
     #print(audio_norm.max(), audio_norm.min())
     melspec = stft.mel_spectrogram(audio_norm)
-    melspec = melspec.squeeze(0).transpose(0,1)
     return melspec
 
 def _sign(x):
@@ -82,7 +81,7 @@ def save_wavenet_map(out_dir, sentences, mels, audios):
             audio_path = os.path.join(out_dir,'audio','audio-{}.npy'.format(i))
             audio = audios[i].astype(dtype=np.int16)
             mel_path = os.path.join(out_dir, 'mels', 'mel-{}.npy'.format(i))
-            mel = mels[i]
+            mel = mels[i].squeeze(0).transpose(0,1)
             sentence = sentences[i]
             np.save(audio_path, audio)
             np.save(mel_path, mel)

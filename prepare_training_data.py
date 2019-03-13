@@ -160,7 +160,7 @@ if __name__ == "__main__":
     """
     usage
     python prepare_training_data.py --dataset=nam-h --out_dir=training_data --for_wavenet
-    python prepare_training_data.py --dataset=park --out_dir=park_m2m --for_wavenet
+    python prepare_training_data.py --dataset=park --out_dir=park_m2m --for_m2m
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--dataset', type=str,

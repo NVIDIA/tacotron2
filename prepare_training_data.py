@@ -73,7 +73,7 @@ def mulaw_quantize(x, mu=256):
 	y = mulaw(x, mu)
 	return _asint((y + 1) / 2 * mu)
 
-def save(out_dir, sentences, mels, audios):
+def save_wavenet_map(out_dir, sentences, mels, audios):
     """
     training_data/audio/audio-1.npy|training_data/mels/mel-1.npy||<no_g>|여기에서 가까운 곳에 서점이 있나요?
     """
@@ -90,7 +90,21 @@ def save(out_dir, sentences, mels, audios):
             file.write(str)
         pass
 
-def prepare_wavenet_training_data(hparams, out_dir, dataset):
+def save_m2m_metadata(out_dir, sentences, mels):
+    """
+    training_data/audio/audio-1.npy|training_data/mels/mel-1.npy||<no_g>|여기에서 가까운 곳에 서점이 있나요?
+    """
+    with open(os.path.join(out_dir, 'metadata.txt'), 'w', encoding='utf-8') as file:
+        for i in range(len(sentences)):
+            mel_path = os.path.join(out_dir, 'mels', 'mel-{}.npy'.format(i))
+            mel = mels[i]
+            sentence = sentences[i]
+            np.save(mel_path, mel)
+            str = "{}|{}\n".format(mel_path, sentence)
+            file.write(str)
+        pass
+
+def prepare_training_data(hparams, out_dir, for_wavenet, for_m2m, dataset):
     mel_dir = os.path.join(out_dir, 'mels')
     wav_dir = os.path.join(out_dir, 'audio')
     os.makedirs(out_dir, exist_ok=True)
@@ -136,14 +150,18 @@ def prepare_wavenet_training_data(hparams, out_dir, dataset):
         if (i%100 == 0):
             print(i)
 
-    save(out_dir, sentences, mels, mus)
+    if(for_wavenet):
+        save_wavenet_map(out_dir, sentences, mels, mus)
+    elif(for_m2m):
+        save_m2m_metadata(out_dir, sentences, mels)
 
     pass
 
 if __name__ == "__main__":
     """
     usage
-    python prepare_wavenet_training_data.py --dataset=nam-h --out_dir=training_data
+    python prepare_training_data.py --dataset=nam-h --out_dir=training_data --for_wavenet
+    python prepare_training_data.py --dataset=park --out_dir=park_m2m --for_wavenet
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--dataset', type=str,
@@ -152,8 +170,8 @@ if __name__ == "__main__":
                         default='training_data', help='file list to preprocess')
     parser.add_argument('--hparams', type=str,
                         required=False, help='comma separated name=value pairs')
+    parser.add_argument('--for_wavenet', action="store_true", help='Whether to save training format for wavenet-mamah ')
+    parser.add_argument('--for_m2m', action="store_true", help='Whether to save training format for mel to mel(voice conversion)')
     args = parser.parse_args()
-    dataset = args.dataset
-    out_dir = args.out_dir
     hparams = create_hparams(args.hparams)
-    prepare_wavenet_training_data(hparams, out_dir, dataset)
+    prepare_training_data(hparams, args.out_dir, args.for_wavenet, args.for_m2m, args.dataset)

@@ -93,7 +93,7 @@ def save_m2m_metadata(out_dir, sentences, mels):
     """
     training_data/audio/audio-1.npy|training_data/mels/mel-1.npy||<no_g>|여기에서 가까운 곳에 서점이 있나요?
     """
-    with open(os.path.join(out_dir, 'metadata.txt'), 'w', encoding='utf-8') as file:
+    with open(os.path.join(out_dir, 'metadata.csv'), 'w', encoding='utf-8') as file:
         for i in range(len(sentences)):
             mel_path = os.path.join(out_dir, 'mels', 'mel-{}.npy'.format(i))
             mel = mels[i].squeeze(0)

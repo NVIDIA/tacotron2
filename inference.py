@@ -43,13 +43,13 @@ def generate_mels(hparams, checkpoint_path, sentences, cleaner, silence_mel_padd
                    alignments.data.cpu().numpy()[0].T), i, output_dir)
         inf_time = time.time() - stime
         print("{}th sentence, Infenrece time: {:.2f}s, len_mel: {}".format(i, inf_time, mel_outputs_postnet.size(2)))
-        output_mels.append(mel_outputs_postnet[:,:,:-silence_mel_padding].data.cpu().numpy())
+        output_mels.append(mel_outputs_postnet[:,:,:-silence_mel_padding].squeeze(0).data.cpu().numpy())
     return output_mels
 
 def mels_to_wavs_GL(hparams, mels, taco_stft, output_dir="", ref_level_db = 0, magnitude_power=1.5):
     for i, mel in enumerate(mels):
         stime = time.time()
-        mel_decompress = mel_denormalize(tourch.from_numpy(mel).cuda())
+        mel_decompress = mel_denormalize(tourch.from_numpy(mel).cuda().unsqueeze(0))
         mel_decompress = taco_stft.spectral_de_normalize(mel_decompress + ref_level_db) ** (1/magnitude_power)
         mel_decompress_ = mel_decompress.transpose(1, 2).data.cpu()
         spec_from_mel_scaling = 1000

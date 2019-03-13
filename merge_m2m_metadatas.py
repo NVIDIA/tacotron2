@@ -5,10 +5,10 @@ import os
 def merge(source_metadata, target_metadata, out_dir=''):
     concatinated_metas = []
     with open(source_metadata, 'r', encoding='utf-8') as file:
-        source_metas = file.readline()
+        source_metas = file.readlines()
     with open(target_metadata, 'r', encoding='utf-8') as file:
-        target_metas = file.readline()
-
+        target_metas = file.readlines()
+    print(len(source_metas),len(target_metas))
     with open(os.path.join(out_dir,'vc_metadata.csv'),'w',encoding='utf-8') as file:
         for i, source_meta in enumerate(source_metas):
             source_meta = source_meta.strip()
@@ -20,7 +20,7 @@ def merge(source_metadata, target_metadata, out_dir=''):
 if __name__ == "__main__":
     """
     usage
-    python merge_m2m_metadatas.py --out_dir=. --source_metadata=park_inferece/metadata.csv --target_metadata=park_m2m/metadata.csv
+    python merge_m2m_metadatas.py --out_dir=. --source_metadata=park_inference/metadata.csv --target_metadata=park_m2m/metadata.csv
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', '--out_dir', default='',type=str, help='output path for voice conversion metadata')

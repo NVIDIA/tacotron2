@@ -128,20 +128,21 @@ def prepare_training_data(hparams, out_dir, for_wavenet, for_m2m, dataset):
         audio_paths.append(audio_path)
 
         audio = get_audio(audio_path)
-        # print(audio.shape, audio.max(), audio.min())
+        #print(audio.shape, audio.max(), audio.min())
         mel = get_mel(stft, audio)
         mels.append(mel)
-        #print(mel.shape, mel.max(), mel.min())
+        #print(mel.shape, mel.max(), mel.min(), mel.size(0))
 
         audio = audio.data.cpu().numpy()
-        diff = len(audio) - hparams.hop_length * mel.size(0)
+        #print(len(audio), hparams.hop_length * mel.size(2))
+        diff = len(audio) - hparams.hop_length * mel.size(2)
         if (diff >= 0):
 
             audio = audio[:-diff]
         else:
             audio = np.append(audio, [0.]*-diff)
 
-        #print(len(audio)%hparams.hop_length ==0, len(audio)//mel.size(0) == hparams.hop_length, len(audio), len(audio)//mel.size(0))
+        #print(len(audio)%hparams.hop_length ==0, len(audio)//mel.size(2) == hparams.hop_length, len(audio), len(audio)//mel.size(2))
 
         mu = mulaw_quantize(audio)
         mus.append(mu)

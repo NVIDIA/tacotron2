@@ -49,7 +49,7 @@ def generate_mels(hparams, checkpoint_path, sentences, cleaner, silence_mel_padd
 def mels_to_wavs_GL(hparams, mels, taco_stft, output_dir="", ref_level_db = 0, magnitude_power=1.5):
     for i, mel in enumerate(mels):
         stime = time.time()
-        mel_decompress = mel_denormalize(tourch.from_numpy(mel).cuda().unsqueeze(0))
+        mel_decompress = mel_denormalize(torch.from_numpy(mel).cuda().unsqueeze(0))
         mel_decompress = taco_stft.spectral_de_normalize(mel_decompress + ref_level_db) ** (1/magnitude_power)
         mel_decompress_ = mel_decompress.transpose(1, 2).data.cpu()
         spec_from_mel_scaling = 1000

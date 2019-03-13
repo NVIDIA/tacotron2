@@ -96,7 +96,7 @@ def save_m2m_metadata(out_dir, sentences, mels):
     with open(os.path.join(out_dir, 'metadata.txt'), 'w', encoding='utf-8') as file:
         for i in range(len(sentences)):
             mel_path = os.path.join(out_dir, 'mels', 'mel-{}.npy'.format(i))
-            mel = mels[i]
+            mel = mels[i].squeeze(0)
             sentence = sentences[i]
             np.save(mel_path, mel)
             str = "{}|{}\n".format(mel_path, sentence)

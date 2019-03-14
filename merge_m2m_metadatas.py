@@ -10,10 +10,12 @@ def merge(source_metadata, target_metadata, out_dir=''):
         target_metas = file.readlines()
     print(len(source_metas),len(target_metas))
     with open(os.path.join(out_dir,'vc_metadata.csv'),'w',encoding='utf-8') as file:
-        for i, source_meta in enumerate(source_metas):
-            source_meta = source_meta.strip()
-            target_meta = target_metas[i].strip()
-            concatinated_metas.append("{}|{}\n".format(source_meta,target_meta))
+        for source_meta in source_metas:
+            s_mel_path, s_text = source_meta.strip().split('|')
+            for target_meta in target_metas:
+                t_mel_path, t_text = target_meta.strip().split('|')
+                if(t_text in s_text and s_text in t_text):
+                    concatinated_metas.append("{}|{}|{}|{}\n".format(s_mel_path,s_text,t_mel_path,t_text))
         file.writelines(concatinated_metas)
     pass
 

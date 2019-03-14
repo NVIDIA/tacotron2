@@ -70,6 +70,7 @@ def run(hparams, checkpoint_path, sentence_path, clenaer, silence_mel_padding, i
     sentences = [x.strip() for x in f.readlines()]
     print('All sentences to infer:',sentences)
     f.close()
+    os.makedirs(output_dir, exist_ok=True)
 
     stft = TacotronSTFT(
         hparams.filter_length, hparams.hop_length, hparams.win_length,
@@ -85,26 +86,30 @@ def run(hparams, checkpoint_path, sentence_path, clenaer, silence_mel_padding, i
         os.makedirs(mel_dir, exist_ok=True)
 
         for i, mel in enumerate(mels):
-            mel_path = os.path.join(output_dir, 'mels/', "mel_{}.npy".format(i))
-            np.save(mel_path, mel)
+            mel_path = os.path.join(output_dir, 'mels/', "mel-{}.npy".format(i))
             mel_paths.append(mel_path)
+            if(list(mel.shape)[1] >=  hparams.max_decoder_steps - silence_mel_padding):
+                continue
+            np.save(mel_path, mel)
+
 
     if is_metaout:
-        if(len(mel_paths) != len(sentences)):
-            print('num_mels is not match with num_sentences')
-        else:
-            with open(os.path.join(output_dir, 'metadata.csv'), 'w', encoding='utf-8') as file:
-                lines = []
-                for i, s in enumerate(sentences):
-                    mel_path = mel_paths[i]
-                    lines.append('{}|{}\n'.format(mel_path,s))
-                file.writelines(lines)
+        with open(os.path.join(output_dir, 'metadata.csv'), 'w', encoding='utf-8') as file:
+            lines = []
+            for i, s in enumerate(sentences):
+                mel_path = mel_paths[i]
+                if (list(mels[i].shape)[1] >= hparams.max_decoder_steps - silence_mel_padding):
+                    continue
+                lines.append('{}|{}\n'.format(mel_path,s))
+            file.writelines(lines)
 
 if __name__ == '__main__':
     """
     usage
-    python inference.py -o=synthesis/80000 -c=nam_h_ep8/checkpoint_80000 -s=test.txt --silence_mel_padding=3 --is_GL -> wave, figure
-    python inference.py -o=. -c=kakao_kss_model_checkpoint_23500 -s=kor_test.txt --silence_mel_padding=3 --is_melout --is_metaout -> mels, metadata.csv
+    python inference.py -o=synthesis/80000 -c=nam_h_ep8/checkpoint_80000 -s=test.txt --silence_mel_padding=3 --is_GL 
+        -> wave, figure
+    python inference.py -o=kss_mels_given_park_text -c=kakao_kss_model_checkpoint_23500 -s=skip_review_percentile_metadata_n.csv --silence_mel_padding=3 --is_melout --is_metaout 
+        -> mels, metadata.csv
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', '--output_directory', type=str,

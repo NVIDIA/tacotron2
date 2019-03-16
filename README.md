@@ -33,6 +33,13 @@ Visit our [website] for audio samples using our published [Tacotron 2] and
 1. `python train.py --output_directory=outdir --log_directory=logdir`
 2. (OPTIONAL) `tensorboard --logdir=outdir/logdir`
 
+## Training using a pre-trained model
+Training using a pre-trained model can lead to faster convergence  
+By default, the dataset dependent text embedding layers are [ignored]
+
+1. Download our published [Tacotron 2] model
+2. `python train.py --output_directory=outdir --log_directory=logdir -c tacotron2_statedict.pt --warm_start`
+
 ## Multi-GPU (distributed) and FP16 Training
 1. `python -m multiproc train.py --output_directory=outdir --log_directory=logdir --hparams=distributed_run=True,fp16_run=True`
 
@@ -69,3 +76,4 @@ Wang and Zongheng Yang.
 [Tacotron 2]: https://drive.google.com/file/d/1c5ZTuT7J08wLUoVZ2KkUs_VdZuJ86ZqA/view?usp=sharing
 [pytorch 1.0]: https://github.com/pytorch/pytorch#installation
 [website]: https://nv-adlr.github.io/WaveGlow
+[ignored]: https://github.com/NVIDIA/tacotron2/blob/master/hparams.py#L22

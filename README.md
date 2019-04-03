@@ -3,10 +3,10 @@
 PyTorch implementation of [Natural TTS Synthesis By Conditioning
 Wavenet On Mel Spectrogram Predictions](https://arxiv.org/pdf/1712.05884.pdf). 
 
-This implementation includes **distributed** and **fp16** support
+This implementation includes **distributed** and **mixed precision** support
 and uses the [LJSpeech dataset](https://keithito.com/LJ-Speech-Dataset/).
 
-Distributed and FP16 support uses NVIDIA's [Apex] and [AMP].
+Distributed and Mixed Precision support relies on NVIDIA's [Apex] and [AMP].
 
 Visit our [website] for audio samples using our published [Tacotron 2] and
 [WaveGlow] models.

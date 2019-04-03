@@ -40,7 +40,7 @@ By default, the dataset dependent text embedding layers are [ignored]
 1. Download our published [Tacotron 2] model
 2. `python train.py --output_directory=outdir --log_directory=logdir -c tacotron2_statedict.pt --warm_start`
 
-## Multi-GPU (distributed) and FP16 Training
+## Multi-GPU (distributed) and Mixed Precision Training
 1. `python -m multiproc train.py --output_directory=outdir --log_directory=logdir --hparams=distributed_run=True,fp16_run=True`
 
 ## Inference demo

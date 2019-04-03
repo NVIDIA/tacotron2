@@ -3,10 +3,10 @@
 PyTorch implementation of [Natural TTS Synthesis By Conditioning
 Wavenet On Mel Spectrogram Predictions](https://arxiv.org/pdf/1712.05884.pdf). 
 
-This implementation includes **distributed** and **mixed precision** support
+This implementation includes **distributed** and **automatic mixed precision** support
 and uses the [LJSpeech dataset](https://keithito.com/LJ-Speech-Dataset/).
 
-Distributed and Mixed Precision support relies on NVIDIA's [Apex] and [AMP].
+Distributed and Automatic Mixed Precision support relies on NVIDIA's [Apex] and [AMP].
 
 Visit our [website] for audio samples using our published [Tacotron 2] and
 [WaveGlow] models.
@@ -40,7 +40,7 @@ By default, the dataset dependent text embedding layers are [ignored]
 1. Download our published [Tacotron 2] model
 2. `python train.py --output_directory=outdir --log_directory=logdir -c tacotron2_statedict.pt --warm_start`
 
-## Multi-GPU (distributed) and Mixed Precision Training
+## Multi-GPU (distributed) and Automatic Mixed Precision Training
 1. `python -m multiproc train.py --output_directory=outdir --log_directory=logdir --hparams=distributed_run=True,fp16_run=True`
 
 ## Inference demo

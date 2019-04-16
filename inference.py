@@ -22,7 +22,7 @@ def plot_data(data, index, output_dir="", figsize=(16, 4)):
                         interpolation='none')
     plt.savefig(os.path.join(output_dir, 'sentence_{}.png'.format(index)))
 
-def generate_mels(hparams, checkpoint_path, sentences, cleaner, silence_mel_padding, is_GL, output_dir=""):
+def generate_mels(hparams, checkpoint_path, sentences, cleaner, removing_silence_mel_padding, adding_silence_mel_padding, is_GL, output_dir=""):
     model = load_model(hparams)
     try:
         model = model.module
@@ -38,12 +38,14 @@ def generate_mels(hparams, checkpoint_path, sentences, cleaner, silence_mel_padd
 
         stime = time.time()
         _, mel_outputs_postnet, _, alignments = model.inference(sequence)
+        mel = mel_outputs_postnet.data.cpu().numpy()[0][:,:-removing_silence_mel_padding]
+        mel = np.append(mel, np.ones((80,adding_silence_mel_padding),dtype=np.float32)*-4.0, axis=1)
         if(is_GL):
-            plot_data((mel_outputs_postnet.data.cpu().numpy()[0],
+            plot_data((mel,
                    alignments.data.cpu().numpy()[0].T), i, output_dir)
         inf_time = time.time() - stime
         print("{}th sentence, Infenrece time: {:.2f}s, len_mel: {}".format(i, inf_time, mel_outputs_postnet.size(2)))
-        output_mels.append(mel_outputs_postnet[:,:,:-silence_mel_padding].squeeze(0).data.cpu().numpy())
+        output_mels.append(mel)
     return output_mels
 
 def mels_to_wavs_GL(hparams, mels, taco_stft, output_dir="", ref_level_db = 0, magnitude_power=1.5):
@@ -65,8 +67,8 @@ def mels_to_wavs_GL(hparams, mels, taco_stft, output_dir="", ref_level_db = 0, m
         print(str)
         write(os.path.join(output_dir,"sentence_{}.wav".format(i)), hparams.sampling_rate, waveform)
 
-def run(hparams, checkpoint_path, sentence_path, clenaer, silence_mel_padding, is_GL, is_melout, is_metaout, output_dir):
-    f = open(sentence_path, 'r')
+def run(hparams, checkpoint_path, sentence_path, clenaer, removing_silence_mel_padding, adding_silence_mel_padding, is_GL, is_melout, is_metaout, output_dir):
+    f = open(sentence_path, 'r', encoding='utf-8')
     sentences = [x.strip() for x in f.readlines()]
     print('All sentences to infer:',sentences)
     f.close()
@@ -77,7 +79,7 @@ def run(hparams, checkpoint_path, sentence_path, clenaer, silence_mel_padding, i
         hparams.n_mel_channels, hparams.sampling_rate, hparams.mel_fmin,
         hparams.mel_fmax)
 
-    mels = generate_mels(hparams, checkpoint_path, sentences, clenaer, silence_mel_padding, is_GL, output_dir)
+    mels = generate_mels(hparams, checkpoint_path, sentences, clenaer, removing_silence_mel_padding, adding_silence_mel_padding, is_GL, output_dir)
     if(is_GL): mels_to_wavs_GL(hparams, mels, stft, output_dir)
 
     mel_paths = []
@@ -88,7 +90,7 @@ def run(hparams, checkpoint_path, sentence_path, clenaer, silence_mel_padding, i
         for i, mel in enumerate(mels):
             mel_path = os.path.join(output_dir, 'mels/', "mel-{}.npy".format(i))
             mel_paths.append(mel_path)
-            if(list(mel.shape)[1] >=  hparams.max_decoder_steps - silence_mel_padding):
+            if(list(mel.shape)[1] >=  hparams.max_decoder_steps - removing_silence_mel_padding):
                 continue
             np.save(mel_path, mel)
 
@@ -98,7 +100,7 @@ def run(hparams, checkpoint_path, sentence_path, clenaer, silence_mel_padding, i
             lines = []
             for i, s in enumerate(sentences):
                 mel_path = mel_paths[i]
-                if (list(mels[i].shape)[1] >= hparams.max_decoder_steps - silence_mel_padding):
+                if (list(mels[i].shape)[1] >= hparams.max_decoder_steps - removing_silence_mel_padding):
                     continue
                 lines.append('{}|{}\n'.format(mel_path,s))
             file.writelines(lines)
@@ -118,8 +120,10 @@ if __name__ == '__main__':
                         required=True, help='checkpoint path')
     parser.add_argument('-s', '--sentence_path', type=str, default=None,
                         required=True, help='sentence path')
-    parser.add_argument('--silence_mel_padding', type=int, default=1,
-                        help='silence audio size is hop_length * silence mel padding')
+    parser.add_argument('--removing_silence_mel_padding', type=int, default=1,
+                        help='removing existing silence_mel_padding, silence audio size is hop_length * silence mel padding')
+    parser.add_argument('--adding_silence_mel_padding', type=int, default=0,
+                        help='adding silence_mel_padding, silence audio size is hop_length * silence mel padding')
     parser.add_argument('--hparams', type=str,
                         required=False, help='comma separated name=value pairs')
     parser.add_argument('--is_GL', action="store_true", help='Whether to do Giffin & Lim inference or not ')
@@ -136,6 +140,6 @@ if __name__ == '__main__':
     torch.backends.cudnn.enabled = hparams.cudnn_enabled
     torch.backends.cudnn.benchmark = hparams.cudnn_benchmark
 
-    run(hparams, args.checkpoint_path, args.sentence_path, hparams.text_cleaners, args.silence_mel_padding, args.is_GL, args.is_melout, args.is_metaout, args.output_directory)
+    run(hparams, args.checkpoint_path, args.sentence_path, hparams.text_cleaners, args.removing_silence_mel_padding, args.adding_silence_mel_padding, args.is_GL, args.is_melout, args.is_metaout, args.output_directory)
 
 

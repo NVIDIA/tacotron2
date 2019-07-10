@@ -25,7 +25,7 @@ def create_hparams(hparams_string=None, verbose=False):
         load_mel_from_disk=False,
         training_files='filelists/kss_train_filelist.txt',
         validation_files='filelists/kss_val_filelist.txt',
-        text_cleaners=['korean_cleaners'], # english_cleaners, korean_cleaners
+        text_cleaners=['english_cleaners'], # english_cleaners, korean_cleaners
         sort_by_length=False,
 
         ################################
@@ -43,7 +43,7 @@ def create_hparams(hparams_string=None, verbose=False):
         ################################
         # Model Parameters             #
         ################################
-        n_symbols = 80, # set 80 if u use korean_cleaners. set 149 if u use english_cleaners
+        n_symbols = 149, # set 80 if u use korean_cleaners. set 149 if u use english_cleaners
         symbols_embedding_dim=512,
 
         # Encoder parameters

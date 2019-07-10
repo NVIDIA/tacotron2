@@ -1,4 +1,4 @@
-tensorflow
+tensorflow=1.13.1
 inflect==0.2.5
 librosa==0.6.0
 scipy==1.0.0

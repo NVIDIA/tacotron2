@@ -4,7 +4,6 @@ from tensorboardX import SummaryWriter
 from plotting_utils import plot_alignment_to_numpy, plot_spectrogram_to_numpy
 from plotting_utils import plot_gate_outputs_to_numpy
 
-
 class Tacotron2Logger(SummaryWriter):
     def __init__(self, logdir):
         super(Tacotron2Logger, self).__init__(logdir)
@@ -28,21 +27,24 @@ class Tacotron2Logger(SummaryWriter):
 
         # plot alignment, mel target and predicted, gate target and predicted
         idx = random.randint(0, alignments.size(0) - 1)
+
         self.add_image(
             "alignment",
             plot_alignment_to_numpy(alignments[idx].data.cpu().numpy().T),
-            iteration)
+            iteration, dataformats='HWC')
         self.add_image(
             "mel_target",
             plot_spectrogram_to_numpy(mel_targets[idx].data.cpu().numpy()),
-            iteration)
+            iteration, dataformats='HWC')
         self.add_image(
             "mel_predicted",
             plot_spectrogram_to_numpy(mel_outputs[idx].data.cpu().numpy()),
-            iteration)
+            iteration, dataformats='HWC')
         self.add_image(
             "gate",
             plot_gate_outputs_to_numpy(
                 gate_targets[idx].data.cpu().numpy(),
                 torch.sigmoid(gate_outputs[idx]).data.cpu().numpy()),
-            iteration)
+            iteration, dataformats='HWC')
+
+

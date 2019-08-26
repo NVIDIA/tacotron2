@@ -15,7 +15,7 @@ from data_utils import TextMelLoader, TextMelCollate
 from loss_function import Tacotron2Loss
 from logger import Tacotron2Logger
 from hparams import create_hparams
-
+from metric import alignment_metric
 
 def reduce_tensor(tensor, n_gpus):
     rt = tensor.clone()
@@ -129,21 +129,30 @@ def validate(model, criterion, valset, iteration, batch_size, n_gpus,
                                 pin_memory=False, collate_fn=collate_fn)
 
         val_loss = 0.0
+        alignment_len_rate = torch.zeros(1)
+        avg_prob = torch.zeros(1)
         for i, batch in enumerate(val_loader):
             x, y = model.parse_batch(batch)
             y_pred = model(x)
+            _, _, _, alignments = y_pred
             loss = criterion(y_pred, y)
             if distributed_run:
                 reduced_val_loss = reduce_tensor(loss.data, n_gpus).item()
             else:
                 reduced_val_loss = loss.item()
             val_loss += reduced_val_loss
+
+            rate, prob = alignment_metric(alignments)
+            alignment_len_rate += rate
+            avg_prob += prob
+        alignment_len_rate = alignment_len_rate / (i + 1)
+        avg_prob = avg_prob / (i + 1)
         val_loss = val_loss / (i + 1)
 
     model.train()
     if rank == 0:
         print("Validation loss {}: {:9f}  ".format(iteration, reduced_val_loss))
-        logger.log_validation(reduced_val_loss, model, y, y_pred, iteration)
+        logger.log_validation(reduced_val_loss, model, y, y_pred, alignment_len_rate, avg_prob, iteration)
 
 
 def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
@@ -233,6 +242,9 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
                 grad_norm = torch.nn.utils.clip_grad_norm_(
                     model.parameters(), hparams.grad_clip_thresh)
 
+            _, _, _, alignments = y_pred
+            alignment_len_rate, avg_prob = alignment_metric(alignments)
+
             optimizer.step()
 
             if not is_overflow and rank == 0:
@@ -240,7 +252,7 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
                 print("Train loss {} {:.6f} Grad Norm {:.6f} {:.2f}s/it".format(
                     iteration, reduced_loss, grad_norm, duration))
                 logger.log_training(
-                    reduced_loss, grad_norm, learning_rate, duration, iteration)
+                    reduced_loss, grad_norm, learning_rate, duration, alignment_len_rate, avg_prob, iteration)
 
             if not is_overflow and (iteration % hparams.iters_per_checkpoint == 0):
                 validate(model, criterion, valset, iteration,

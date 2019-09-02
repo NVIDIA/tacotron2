@@ -1,5 +1,5 @@
 import random
-import torch.nn.functional as F
+import torch
 from tensorboardX import SummaryWriter
 from plotting_utils import plot_alignment_to_numpy, plot_spectrogram_to_numpy
 from plotting_utils import plot_gate_outputs_to_numpy
@@ -44,5 +44,5 @@ class Tacotron2Logger(SummaryWriter):
             "gate",
             plot_gate_outputs_to_numpy(
                 gate_targets[idx].data.cpu().numpy(),
-                F.sigmoid(gate_outputs[idx]).data.cpu().numpy()),
+                torch.sigmoid(gate_outputs[idx]).data.cpu().numpy()),
             iteration)

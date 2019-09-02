@@ -126,7 +126,9 @@ class STFT(torch.nn.Module):
                 torch.from_numpy(window_sum), requires_grad=False)
             inverse_transform[:, :, approx_nonzero_indices] /= window_sum[approx_nonzero_indices]
 
-            # scale by hop ratio
+            window_sum = window_sum.cuda() if magnitude.is_cuda else window_sum
+
+        # scale by hop ratio
             inverse_transform *= float(self.filter_length) / self.hop_length
 
         inverse_transform = inverse_transform[:, :, int(self.filter_length/2):]

@@ -3,7 +3,7 @@ import librosa
 import numpy as np
 import argparse
 
-sr = 22050
+sr = 24000
 max_wav_value=32768.0
 trim_fft_size = 1024
 trim_hop_size = 256

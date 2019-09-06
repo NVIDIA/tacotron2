@@ -1,114 +1,115 @@
 import torch
 from torch.autograd import Variable
 import numpy as np
+from utils import load_wav_to_torch
+from hparams import create_hparams
+from layers import TacotronSTFT
 
-import wave
-from scipy.io.wavfile import read
-from layers import cepstral
-from parabolic import parabolic
-from scipy.signal import blackmanharris
+def alignment_metric(alignments, input_lengths, output_lengths):
+    # alignments [batch size, x, y]
+    # input_lengths [batch size] for len_x
+    # output_lengths [batch size] for len_y
 
+    batch_size = alignments.size(0)
+    optimums = torch.sqrt(input_lengths.double()**2 + output_lengths.double()**2)
 
-
-def alignment_metric(alignments):
-    #device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    x_len = torch.from_numpy(np.array(alignments[0].shape[1])).float()
-    y_len = torch.from_numpy(np.array(alignments[0].shape[0])).float()
-
-    # Compute the squared distances
-    optimum = np.array((x_len.pow(2) + y_len.pow(2)).pow(0.5))
-    dist = torch.zeros(1)
+    diagonalitys = torch.zeros(batch_size)
     val_sum = torch.zeros(1)
-    for i in range(np.int(y_len)):
-        value, cur_idx = torch.max(alignments[0][i], 0)
-        val_sum += value
-        if i==0:
-            prev_idx = cur_idx
-            continue
-        else:
-            dist += (1 + (cur_idx - prev_idx).pow(2)).float().pow(0.5)
-            prev_idx = cur_idx
+    for i in range(batch_size):
+        dist = torch.zeros(1)
+        for j in range(output_lengths[i]):
+            value, cur_idx = torch.max(alignments[i][:][j], 0)
+            val_sum += value
+            if j==0:
+                prev_idx = cur_idx
+                continue
+            else:
+                dist += (1 + (cur_idx - prev_idx).pow(2)).float().pow(0.5)
+                prev_idx = cur_idx
+        diagonalitys[i] = Variable(dist/optimums[i])
+    avg_prob = Variable(val_sum / torch.sum(output_lengths).float())
+    diagonality = torch.mean(diagonalitys)
+    return diagonality, avg_prob
 
-    avg_prob = Variable(val_sum /y_len).float()
-    optimum = torch.from_numpy(optimum)
-    rate = Variable(dist/optimum)
+def evaluation_metrics(stft, source_mels, target_mels):
+    batch_size = source_mels.size(0)
+    MCDs = torch.zeros(batch_size)
+    f0s = None
+    for i in range(batch_size):
+        src_mel = source_mels[i].unsqueeze(0)
+        src_mel = torch.clamp(src_mel, min=-4.0, max=4.0)
+        dst_mel = target_mels[i].unsqueeze(0)
+        dst_mel = torch.clamp(dst_mel, min=-4.0, max=4.0)
+        MCDs[i] = MCD_from_mels(stft, src_mel, dst_mel)
+        f0 = sqDiffF0_from_mels(stft, src_mel, dst_mel)
+        f0s = f0 if f0s is None else torch.cat((f0s, f0), 0)
 
-    return rate, avg_prob
+    avg_MCD = torch.mean(MCDs)
+    avg_f0 = torch.mean(f0s)
+
+    return avg_MCD, avg_f0
+
+def melCepDist(srcMCC, dstMCC):
+    # https://dsp.stackexchange.com/questions/56391/mel-cepstral-distortion
+    diff = dstMCC - srcMCC
+    return torch.sum((torch.sqrt( 2 * (diff**2) ) ))* (10.0/np.log(10)) * 1/diff.size(1)
+
+def f0(MCC):
+    #print(MCC.shape, MCC.max(), MCC.min())
+    _, f0 = MCC.max(0)
+    return f0
+
+def MCD_from_mels(stft, srcMel, dstMel):
+    srcMCC = stft.cepstrum_from_mel(srcMel)[0,:25,:]
+    #print('srcMCC: ', srcMCC.max(), srcMCC.min())
+    dstMCC = stft.cepstrum_from_mel(dstMel)[0,:25,:]
+    #print('dstMCC: ', dstMCC.max(), dstMCC.min())
+    MCD = melCepDist(srcMCC,dstMCC)
+    log_MCD = torch.log10(torch.clamp(MCD,min=1e-5))
+    return log_MCD
+
+def sqDiffF0_from_mels(stft, srcMel, dstMel):
+    srcMCC = stft.cepstrum_from_mel(srcMel).squeeze(0)
+    dstMCC = stft.cepstrum_from_mel(dstMel).squeeze(0)
+    srcF0 = f0(srcMCC)
+    dstF0 = f0(dstMCC)
+    diff = (dstF0 - srcF0).double()
+    return torch.sqrt(diff**2)
+
+def test_MCD_and_f0():
+    hparams = create_hparams()
+    stft = TacotronSTFT(
+        hparams.filter_length, hparams.hop_length, hparams.win_length,
+        hparams.n_mel_channels, hparams.sampling_rate, hparams.mel_fmin,
+        hparams.mel_fmax)
+    audio_path = 'kakao/1/1_0001.wav'
+    mel_path = 'kakao/1/1_0001.mel.npy'
+    srcMel = torch.from_numpy(np.load(mel_path)).unsqueeze(0)
+    srcMel = torch.clamp(srcMel, -4.0, 4.0)
+    # print(srcMel.shape,  srcMel.max(), srcMel.min())
+    audio, sr = load_wav_to_torch(audio_path)
+    # print(audio.shape, audio.max(), audio.min())
+    audio_norm = audio / hparams.max_wav_value
+    audio_norm = audio_norm.unsqueeze(0)
+    audio_norm = torch.autograd.Variable(audio_norm, requires_grad=False)
+
+    # print(audio_norm.shape, audio_norm.max(), audio_norm.min())
+    dstMel = stft.mel_spectrogram(audio_norm)
+    # print(dstMel.shape, dstMel.max(), dstMel.min())
+    # mcc = stft.cepstrum_from_audio(audio_norm)
+    # print('mcc', mcc.shape, mcc.max(), mcc.min())
+
+    log_MCD = MCD_from_mels(stft, srcMel, dstMel)
+    print(log_MCD.data, 'log')
+
+    sqrtDiffF0 = sqDiffF0_from_mels(stft, srcMel, dstMel)
+    print(sqrtDiffF0)
+    meanSqrtDiffF0 = torch.mean(sqrtDiffF0)
+    print(meanSqrtDiffF0.data, '100hz')
+
+#alignment_metric()
+if __name__ == "__main__":
+    test_MCD_and_f0()
 
 
-def MCD(source_sound, syn_sound):
-    sourc_cep = source_sound.cepstral()
-    syn_cep = syn_sound.cepstral()
-
-    mcd = 10 * ((2*torch.sum(sourc_cep-syn_cep).pow(2)).pow(0.5))/torch.log(10)
-
-    return mcd
-
-
-def freq_from_fft(sig, fs):
-    """
-    Estimate frequency from peak of FFT
-    """
-    # Compute Fourier transform of windowed signal
-    windowed = sig * blackmanharris(len(sig))
-    f = np.fft.rfft(windowed)
-
-    # Find the peak and interpolate to get a more accurate peak
-    i = np.argmax(abs(f))  # Just use this for less-accurate, naive version
-    true_i = parabolic(np.log(abs(f)), i)[0]
-
-    # Convert to equivalent frequency
-    return torch.from_numpy(np.array(fs * true_i / len(windowed))).float()
-
-
-def f0(wav):
-    nchannels, sampwidth, framerate, nframes, comptype, compname = wav.getparams()
-
-    # Inititalize a fundamental frequency
-    freqs = torch.tensor([])
-    up = framerate // 80
-    down = framerate // 270
-    d = framerate / 270.0
-
-    # Number of frames per window
-    window_size = 1024
-
-    # Create a window function
-    window = np.hamming(window_size)
-
-    # Iterate over the wave file frames
-    for i in range(nframes // window_size):
-        # Reading n=window_size frames from the wave file
-        content = wav.readframes(window_size)
-
-        # Converting array of bytes to array of integers according to sampwidth. If stereo only the first channel is picked
-        samples = np.fromstring(content, dtype=types[sampwidth])[0::nchannels]
-
-        # Applying window function for our samples
-        samples = torch.from_numpy(window * samples)
-
-        # Calculating spectrum of a signal frame as fft with n=window_size
-        #spectrum = np.fft.fft(samples, n=window_size)
-
-        # Calculating cepstrum as ifft(log(abs(spectrum))))
-        #cepstrum = np.fft.ifft(np.log(np.abs(spectrum))).real
-
-        cepstrum = cepstral(samples)
-
-        _, idx = torch.max(cepstrum[down:up])
-
-        # Calculating fundamental frequency by finding peak
-        fund_freq = torch.from_numpy(np.array(framerate)).float() * cepstrum.shape[0] / (idx + d) / cepstrum.shape[0]
-        freqs = torch.cat(freqs, fund_freq)
-
-    return torch.from_numpy(np.array(freqs))
-
-
-def cal_fft(src_sound, syn_sound):
-    src_f0 = f0(src_sound)
-    syn_f0 = f0(syn_sound)
-    return Variable(torch.sum(((src_f0 - syn_f0).pow(2))/src_f0.shape[0]).pow(0.5))
-
-#src_sound = wave.open("C:/Users/chme/Desktop/Voice_AI/wavenet-audio-mel_wiener_.wav", mode='r')
-#syn_sound = wave.open("C:/Users/chme/Desktop/Voice_AI/wavenet-audio-mel_.wav", mode='r')
-#print(cal_fft(src_sound, syn_sound)) #, MCD(source_sound, syn_sound))
+    #np.save('mel.npy' ,mel)

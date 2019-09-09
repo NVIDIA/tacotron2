@@ -124,6 +124,16 @@ Modifies existing model to do gradient allreduce, but doesn't change class
 so you don't need "module"
 '''
 def apply_gradient_allreduce(module):
+        # torch.cuda.set_device(args.rank % torch.cuda.device_count())
+        #
+        # print("initialzing")
+        # # Initialize distributed communication
+        # dist.init_process_group(
+        #
+        #     backend='nccl', init_method='tcp://localhost:23458',
+        #     world_size=4, group_name='group_name',rank= args.rank)
+        # print("done initializing")
+
         if not hasattr(dist, '_backend'):
             module.warn_on_half = True
         else:

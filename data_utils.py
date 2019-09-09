@@ -29,24 +29,49 @@ class TextMelLoader(torch.utils.data.Dataset):
 
     def get_mel_text_pair(self, audiopath_and_text):
         # separate filename and text
-        audiopath, text = audiopath_and_text[0], audiopath_and_text[1]
+        audiopath, text = audiopath_and_text[0], audiopath_and_text[2]
         text = self.get_text(text) # int_tensor[char_index, ....]
         mel = self.get_mel(audiopath) # []
         return (text, mel)
 
     def get_mel(self, filename):
         if not self.load_mel_from_disk:
-            filename = '../../tacotron2_multispeaker_pytorch/processing'+filename
 
-            audio, sampling_rate = load_wav_to_torch(filename)
-            if sampling_rate != self.stft.sampling_rate:
-                raise ValueError("{} {} SR doesn't match target {} SR".format(
-                    sampling_rate, self.stft.sampling_rate))
+            try :
+                # files = '../../tacotron2_multispeaker_pytorch/processing'+filename
+                files = './data/'+filename
+                #print(files)
+
+
+                audio, sampling_rate = load_wav_to_torch(files)
+                #print(sampling_rate)
+
+
+
+            except :
+
+                print("cant find",files)
+                try :
+                    #filename = '../../tacotron2_multispeaker_pytorch/processing'+filename[1:]
+
+
+                    audio, sampling_rate = load_wav_to_torch(filename)
+                except :
+                    print("really cant find", filename)
+
+            # if sampling_rate != self.stft.sampling_rate:
+            #     raise ValueError("{} {} SR doesn't match target {} SR".format(
+            #         sampling_rate, self.stft.sampling_rate))
             audio_norm = audio / self.max_wav_value
             audio_norm = audio_norm.unsqueeze(0)
             audio_norm = torch.autograd.Variable(audio_norm, requires_grad=False)
-            melspec = self.stft.mel_spectrogram(audio_norm)
-            melspec = torch.squeeze(melspec, 0)
+            try:
+                melspec = self.stft.mel_spectrogram(audio_norm)
+                melspec = torch.squeeze(melspec, 0)
+            except :
+                print("steroo",filename)
+                melspec = None
+
         else:
             melspec = torch.from_numpy(np.load(filename))
             assert melspec.size(0) == self.stft.n_mel_channels, (
@@ -110,4 +135,5 @@ class TextMelCollate():
             output_lengths[i] = mel.size(1)
 
         return text_padded, input_lengths, mel_padded, gate_padded, \
-            output_lengths
+               output_lengths
+

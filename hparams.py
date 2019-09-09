@@ -8,23 +8,24 @@ def create_hparams(hparams_string=None, verbose=False):
         # Experiment Parameters        #
         ################################
         epochs=270,
-        iters_per_checkpoint=2,
+        iters_per_checkpoint=500,
         seed=1234,
         dynamic_loss_scaling=True,
-        fp16_run=True,
-        distributed_run=True,
+        fp16_run=False,
+        distributed_run=False,
 
         dist_backend="nccl",
         dist_url="tcp://localhost:54321",
         cudnn_enabled=True,
         cudnn_benchmark=False,
+        ignore_layers = ['embedding.weight'],
 
         ################################
         # Data Parameters             #
         ################################
         load_mel_from_disk=False,
-        training_files='boyoung_train.txt',
-        validation_files='boyoung_val.txt',
+        training_files='data/new.txt',
+        validation_files='',
         text_cleaners=['korean_cleaners'], # english_cleaners, korean_cleaners
         sort_by_length=False,
 
@@ -32,7 +33,7 @@ def create_hparams(hparams_string=None, verbose=False):
         # Audio Parameters             #
         ################################
         max_wav_value=32768.0,
-        sampling_rate=24000,
+        sampling_rate=22050,
         filter_length=1024,
         hop_length=256, # number audio of frames between stft colmns, default win_length/4
         win_length=1024, # win_length int <= n_ftt: fft window size (frequency domain), defaults to win_length = n_fft

@@ -3,11 +3,10 @@
 PyTorch implementation of [Natural TTS Synthesis By Conditioning
 Wavenet On Mel Spectrogram Predictions](https://arxiv.org/pdf/1712.05884.pdf). 
 
-This implementation includes **distributed** and **fp16** support
+This implementation includes **distributed** and **automatic mixed precision** support
 and uses the [LJSpeech dataset](https://keithito.com/LJ-Speech-Dataset/).
 
-Distributed and FP16 support relies on work by Christian Sarofeen and NVIDIA's
-[Apex Library](https://github.com/nvidia/apex).
+Distributed and Automatic Mixed Precision support relies on NVIDIA's [Apex] and [AMP].
 
 Visit our [website] for audio samples using our published [Tacotron 2] and
 [WaveGlow] models.
@@ -26,14 +25,22 @@ Visit our [website] for audio samples using our published [Tacotron 2] and
 5. Update .wav paths: `sed -i -- 's,DUMMY,ljs_dataset_folder/wavs,g' filelists/*.txt`
     - Alternatively, set `load_mel_from_disk=True` in `hparams.py` and update mel-spectrogram paths 
 6. Install [PyTorch 1.0]
-7. Install python requirements or build docker image 
+7. Install [Apex]
+8. Install python requirements or build docker image 
     - Install python requirements: `pip install -r requirements.txt`
 
 ## Training
 1. `python train.py --output_directory=outdir --log_directory=logdir`
 2. (OPTIONAL) `tensorboard --logdir=outdir/logdir`
 
-## Multi-GPU (distributed) and FP16 Training
+## Training using a pre-trained model
+Training using a pre-trained model can lead to faster convergence  
+By default, the dataset dependent text embedding layers are [ignored]
+
+1. Download our published [Tacotron 2] model
+2. `python train.py --output_directory=outdir --log_directory=logdir -c tacotron2_statedict.pt --warm_start`
+
+## Multi-GPU (distributed) and Automatic Mixed Precision Training
 1. `python -m multiproc train.py --output_directory=outdir --log_directory=logdir --hparams=distributed_run=True,fp16_run=True`
 
 ## Inference demo
@@ -65,7 +72,10 @@ We are thankful to the Tacotron 2 paper authors, specially Jonathan Shen, Yuxuan
 Wang and Zongheng Yang.
 
 
-[WaveGlow]: https://drive.google.com/file/d/1cjKPHbtAMh_4HTHmuIGNkbOkPBD9qwhj/view?usp=sharing
+[WaveGlow]: https://drive.google.com/file/d/1WsibBTsuRg_SF2Z6L6NFRTT-NjEy1oTx/view?usp=sharing
 [Tacotron 2]: https://drive.google.com/file/d/1c5ZTuT7J08wLUoVZ2KkUs_VdZuJ86ZqA/view?usp=sharing
 [pytorch 1.0]: https://github.com/pytorch/pytorch#installation
 [website]: https://nv-adlr.github.io/WaveGlow
+[ignored]: https://github.com/NVIDIA/tacotron2/blob/master/hparams.py#L22
+[Apex]: https://github.com/nvidia/apex
+[AMP]: https://github.com/NVIDIA/apex/tree/master/apex/amp

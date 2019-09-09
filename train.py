@@ -9,14 +9,17 @@ from distributed import apply_gradient_allreduce
 import torch.distributed as dist
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data import DataLoader
+
 #
 # from fp16_optimizer import FP16_Optimizer
+
 
 from model import Tacotron2
 from data_utils import TextMelLoader, TextMelCollate
 from loss_function import Tacotron2Loss
 from logger import Tacotron2Logger
 from hparams import create_hparams
+
 
 
 # def batchnorm_to_float(module):
@@ -57,6 +60,7 @@ def prepare_dataloaders(hparams):
     valset = None
     collate_fn = TextMelCollate(hparams.n_frames_per_step)
 
+
     # train_sampler = DistributedSampler(trainset) \
     #     if hparams.distributed_run else None
     #
@@ -66,6 +70,7 @@ def prepare_dataloaders(hparams):
     #                           drop_last=True, collate_fn=collate_fn)
     # return train_loader, valset, collate_fn
 
+
     if hparams.distributed_run:
         train_sampler = DistributedSampler(trainset)
         shuffle = False
@@ -74,6 +79,7 @@ def prepare_dataloaders(hparams):
         shuffle = True
 
     train_loader = DataLoader(trainset, num_workers=0, shuffle=shuffle,
+
                               sampler=train_sampler,
                               batch_size=hparams.batch_size, pin_memory=False,
                               drop_last=True, collate_fn=collate_fn)
@@ -94,9 +100,11 @@ def prepare_directories_and_logger(output_directory, log_directory, rank):
 def load_model(hparams):
     model = Tacotron2(hparams).cuda()
     if hparams.fp16_run:
+
         #model = batchnorm_to_float(model.half())
         #model.decoder.attention_layer.score_mask_value = float(finfo('float16').min)
         model.decoder.attention_layer.score_mask_value = finfo('float16').min
+
 
 
     if hparams.distributed_run:
@@ -198,12 +206,19 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
     learning_rate = hparams.learning_rate
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate,
                                  weight_decay=hparams.weight_decay)
+
     if hparams.fp16_run:
+
         # optimizer = FP16_Optimizer(
         from apex import amp
         model, optimizer = amp.initialize(
             model, optimizer, opt_level='O2')
         #     optimizer, dynamic_loss_scale=hparams.dynamic_loss_scaling)
+
+        from apex import amp
+        model, optimizer = amp.initialize(
+            model, optimizer, opt_level='O2')
+
 
     if hparams.distributed_run:
         model = apply_gradient_allreduce(model)
@@ -220,7 +235,9 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
     epoch_offset = 0
     if checkpoint_path is not None:
         if warm_start:
+
             model = warm_start_model(checkpoint_path, model ,hparams.ignore_layers)
+
         else:
             model, optimizer, _learning_rate, iteration = load_checkpoint(
                 checkpoint_path, model, optimizer)
@@ -249,8 +266,8 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
                 reduced_loss = reduce_tensor(loss.data, n_gpus).item()
             else:
                 reduced_loss = loss.item()
-
             if hparams.fp16_run:
+
                 # optimizer.backward(loss)
                 # grad_norm = optimizer.clip_fp32_grads(hparams.grad_clip_thresh)
                 with amp.scale_loss(loss, optimizer) as scaled_loss:
@@ -262,6 +279,8 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
             if hparams.fp16_run:
                 grad_norm = torch.nn.utils.clip_grad_norm_(
                 amp.master_params(optimizer), hparams.grad_clip_thresh)
+
+ 
                 is_overflow = math.isnan(grad_norm)
             else:
                 grad_norm = torch.nn.utils.clip_grad_norm_(
@@ -269,11 +288,15 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
 
             optimizer.step()
 
+
             overflow = optimizer.overflow if hparams.fp16_run else False
 
-            #
-            # if not is_overflow and rank==0:
+#             #
+#             # if not is_overflow and rank==0:
             if not overflow and not math.isnan(reduced_loss) and rank == 0:
+# =======
+#             if not is_overflow and rank == 0:
+# >>>>>>> master
                 duration = time.perf_counter() - start
                 print("Train loss {} {:.6f} Grad Norm {:.6f} {:.2f}s/it".format(
                     iteration, reduced_loss, grad_norm, duration))
@@ -281,9 +304,11 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
                     reduced_loss, grad_norm, learning_rate, duration, iteration)
 
             if not is_overflow and (iteration % hparams.iters_per_checkpoint == 0):
+
                 # validate(model, criterion, valset, iteration,
                 #          hparams.batch_size, n_gpus, collate_fn, logger,
                 #          hparams.distributed_run, rank)
+
                 if rank == 0:
                     checkpoint_path = os.path.join(
                         output_directory, "checkpoint_{}".format(iteration))
@@ -302,7 +327,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--checkpoint_path', type=str, default=None,
                         required=False, help='checkpoint path')
     parser.add_argument('--warm_start', action='store_true',
-                        help='load the model only (warm start)')
+                        help='load model weights only, ignore specified layers')
     parser.add_argument('--n_gpus', type=int, default=1,
                         required=False, help='number of gpus')
     parser.add_argument('--rank', type=int, default=0,

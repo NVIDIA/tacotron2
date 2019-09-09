@@ -17,7 +17,7 @@ class Tacotron2Logger(SummaryWriter):
         self.add_scalar("duration", duration, iteration)
         self.add_scalar("training.attention_alignment_diagonality", diagonality, iteration)
         self.add_scalar("training.average_max_attention_weight", avg_prob, iteration)
-        self.add_scalar("training.MCD", avg_MCD, iteration)
+        self.add_scalar("training.log_MCD", avg_MCD, iteration)
         self.add_scalar("training.f0(100hz)", avg_f0, iteration)
 
     def log_validation(self, reduced_loss, model, y, y_pred, diagonality, avg_prob, avg_MCD, avg_f0, iteration):
@@ -26,7 +26,7 @@ class Tacotron2Logger(SummaryWriter):
         mel_targets, gate_targets = y
         self.add_scalar("validation.attention_alignment_diagonality", diagonality, iteration)
         self.add_scalar("validation.average_max_attention_weight", avg_prob, iteration)
-        self.add_scalar("validation.MCD", avg_MCD, iteration)
+        self.add_scalar("validation.log_MCD", avg_MCD, iteration)
         self.add_scalar("validation.f0(100hz)", avg_f0, iteration)
 
         # plot distribution of parameters

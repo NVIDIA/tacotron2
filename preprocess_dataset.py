@@ -26,11 +26,11 @@ def preprocess_audio(file_list, silence_audio_size, pre_emphasis=True):
             wav_file = r.split('|')[0]
             data, sampling_rate = librosa.core.load(wav_file, sr)
             data = data / np.abs(data).max() *0.999
-            if(pre_emphasis):
-                data = np.append(data[0], data[1:] - 0.97 * data[:-1])
-                data = data / np.abs(data).max() * 0.999
             data_= librosa.effects.trim(data, top_db= trim_top_db, frame_length=trim_fft_size, hop_length=trim_hop_size)[0]
             data_ = data_*max_wav_value
+            if (pre_emphasis):
+                data_ = np.append(data_[0], data_[1:] - 0.97 * data_[:-1])
+                data_ = data_ / np.abs(data_).max() * 0.999
             data_ = np.append(data_, [0.]*silence_audio_size)
             data_ = data_.astype(dtype=np.int16)
             write(wav_file, sr, data_)

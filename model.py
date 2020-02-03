@@ -1,10 +1,11 @@
 from math import sqrt
+
 import torch
-from torch.autograd import Variable
 from torch import nn
 from torch.nn import functional as F
+
 from layers import ConvNorm, LinearNorm
-from utils import to_gpu, get_mask_from_lengths
+from utils import get_mask_from_lengths
 
 
 class LocationLayer(nn.Module):
@@ -107,7 +108,7 @@ class Postnet(nn.Module):
 
     def __init__(self, hparams):
         super(Postnet, self).__init__()
-        self.convolutions = nn.ModuleList()
+        self.convolutions = []
 
         self.convolutions.append(
             nn.Sequential(
@@ -136,7 +137,9 @@ class Postnet(nn.Module):
                          padding=int((hparams.postnet_kernel_size - 1) / 2),
                          dilation=1, w_init_gain='linear'),
                 nn.BatchNorm1d(hparams.n_mel_channels))
-            )
+        )
+
+        self.convolutions = nn.ModuleList(self.convolutions)
 
     def forward(self, x):
         for i in range(len(self.convolutions) - 1):
@@ -151,6 +154,7 @@ class Encoder(nn.Module):
         - Three 1-d convolution banks
         - Bidirectional LSTM
     """
+
     def __init__(self, hparams):
         super(Encoder, self).__init__()
 
@@ -178,14 +182,12 @@ class Encoder(nn.Module):
 
         # pytorch tensor are not reversible, hence the conversion
         input_lengths = input_lengths.cpu().numpy()
-        x = nn.utils.rnn.pack_padded_sequence(
-            x, input_lengths, batch_first=True)
+        x = nn.utils.rnn.pack_padded_sequence(x, input_lengths, batch_first=True)
 
         self.lstm.flatten_parameters()
         outputs, _ = self.lstm(x)
 
-        outputs, _ = nn.utils.rnn.pad_packed_sequence(
-            outputs, batch_first=True)
+        outputs, _ = nn.utils.rnn.pad_packed_sequence(outputs, batch_first=True)
 
         return outputs
 
@@ -230,7 +232,7 @@ class Decoder(nn.Module):
 
         self.decoder_rnn = nn.LSTMCell(
             hparams.attention_rnn_dim + hparams.encoder_embedding_dim,
-            hparams.decoder_rnn_dim, 1)
+            hparams.decoder_rnn_dim, True)
 
         self.linear_projection = LinearNorm(
             hparams.decoder_rnn_dim + hparams.encoder_embedding_dim,
@@ -239,6 +241,18 @@ class Decoder(nn.Module):
         self.gate_layer = LinearNorm(
             hparams.decoder_rnn_dim + hparams.encoder_embedding_dim, 1,
             bias=True, w_init_gain='sigmoid')
+
+        # Decoder placeholders:
+        self.attention_hidden = None
+        self.attention_cell = None
+        self.decoder_hidden = None
+        self.decoder_cell = None
+        self.attention_weights = None
+        self.attention_weights_cum = None
+        self.attention_context = None
+        self.memory = None
+        self.processed_memory = None
+        self.mask = None
 
     def get_go_frame(self, memory):
         """ Gets all zeros frames to use as first decoder input
@@ -251,8 +265,7 @@ class Decoder(nn.Module):
         decoder_input: all zeros frames
         """
         B = memory.size(0)
-        decoder_input = Variable(memory.data.new(
-            B, self.n_mel_channels * self.n_frames_per_step).zero_())
+        decoder_input = memory.data.new(B, self.n_mel_channels * self.n_frames_per_step).zero_()
         return decoder_input
 
     def initialize_decoder_states(self, memory, mask):
@@ -267,22 +280,15 @@ class Decoder(nn.Module):
         B = memory.size(0)
         MAX_TIME = memory.size(1)
 
-        self.attention_hidden = Variable(memory.data.new(
-            B, self.attention_rnn_dim).zero_())
-        self.attention_cell = Variable(memory.data.new(
-            B, self.attention_rnn_dim).zero_())
+        self.attention_hidden = memory.data.new(B, self.attention_rnn_dim).zero_()
+        self.attention_cell = memory.data.new(B, self.attention_rnn_dim).zero_()
 
-        self.decoder_hidden = Variable(memory.data.new(
-            B, self.decoder_rnn_dim).zero_())
-        self.decoder_cell = Variable(memory.data.new(
-            B, self.decoder_rnn_dim).zero_())
+        self.decoder_hidden = memory.data.new(B, self.decoder_rnn_dim).zero_()
+        self.decoder_cell = memory.data.new(B, self.decoder_rnn_dim).zero_()
 
-        self.attention_weights = Variable(memory.data.new(
-            B, MAX_TIME).zero_())
-        self.attention_weights_cum = Variable(memory.data.new(
-            B, MAX_TIME).zero_())
-        self.attention_context = Variable(memory.data.new(
-            B, self.encoder_embedding_dim).zero_())
+        self.attention_weights = memory.data.new(B, MAX_TIME).zero_()
+        self.attention_weights_cum = memory.data.new(B, MAX_TIME).zero_()
+        self.attention_context = memory.data.new(B, self.encoder_embedding_dim).zero_()
 
         self.memory = memory
         self.processed_memory = self.attention_layer.memory_layer(memory)
@@ -303,7 +309,7 @@ class Decoder(nn.Module):
         decoder_inputs = decoder_inputs.transpose(1, 2)
         decoder_inputs = decoder_inputs.view(
             decoder_inputs.size(0),
-            int(decoder_inputs.size(1)/self.n_frames_per_step), -1)
+            int(decoder_inputs.size(1) / self.n_frames_per_step), -1)
         # (B, T_out, n_mel_channels) -> (T_out, B, n_mel_channels)
         decoder_inputs = decoder_inputs.transpose(0, 1)
         return decoder_inputs
@@ -455,7 +461,7 @@ class Decoder(nn.Module):
 
 
 class Tacotron2(nn.Module):
-    def __init__(self, hparams):
+    def __init__(self, hparams, device):
         super(Tacotron2, self).__init__()
         self.mask_padding = hparams.mask_padding
         self.fp16_run = hparams.fp16_run
@@ -470,15 +476,16 @@ class Tacotron2(nn.Module):
         self.decoder = Decoder(hparams)
         self.postnet = Postnet(hparams)
 
+        self.device = device
+
     def parse_batch(self, batch):
-        text_padded, input_lengths, mel_padded, gate_padded, \
-            output_lengths = batch
-        text_padded = to_gpu(text_padded).long()
-        input_lengths = to_gpu(input_lengths).long()
+        text_padded, input_lengths, mel_padded, gate_padded, output_lengths = batch
+        text_padded = text_padded.to(self.device)
+        input_lengths = input_lengths.to(self.device)
         max_len = torch.max(input_lengths.data).item()
-        mel_padded = to_gpu(mel_padded).float()
-        gate_padded = to_gpu(gate_padded).float()
-        output_lengths = to_gpu(output_lengths).long()
+        mel_padded = mel_padded.to(self.device)
+        gate_padded = gate_padded.to(self.device)
+        output_lengths = output_lengths.to(self.device)
 
         return (
             (text_padded, input_lengths, mel_padded, max_len, output_lengths),

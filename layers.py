@@ -1,5 +1,6 @@
 import torch
 from librosa.filters import mel as librosa_mel_fn
+
 from audio_processing import dynamic_range_compression
 from audio_processing import dynamic_range_decompression
 from stft import STFT
@@ -23,7 +24,7 @@ class ConvNorm(torch.nn.Module):
                  padding=None, dilation=1, bias=True, w_init_gain='linear'):
         super(ConvNorm, self).__init__()
         if padding is None:
-            assert(kernel_size % 2 == 1)
+            assert (kernel_size % 2 == 1)
             padding = int(dilation * (kernel_size - 1) / 2)
 
         self.conv = torch.nn.Conv1d(in_channels, out_channels,
@@ -52,11 +53,13 @@ class TacotronSTFT(torch.nn.Module):
         mel_basis = torch.from_numpy(mel_basis).float()
         self.register_buffer('mel_basis', mel_basis)
 
-    def spectral_normalize(self, magnitudes):
+    @staticmethod
+    def spectral_normalize(magnitudes):
         output = dynamic_range_compression(magnitudes)
         return output
 
-    def spectral_de_normalize(self, magnitudes):
+    @staticmethod
+    def spectral_de_normalize(magnitudes):
         output = dynamic_range_decompression(magnitudes)
         return output
 
@@ -70,8 +73,8 @@ class TacotronSTFT(torch.nn.Module):
         -------
         mel_output: torch.FloatTensor of shape (B, n_mel_channels, T)
         """
-        assert(torch.min(y.data) >= -1)
-        assert(torch.max(y.data) <= 1)
+        assert (torch.min(y.data) >= -1)
+        assert (torch.max(y.data) <= 1)
 
         magnitudes, phases = self.stft_fn.transform(y)
         magnitudes = magnitudes.data

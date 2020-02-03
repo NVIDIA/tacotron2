@@ -59,8 +59,8 @@ def create_hparams():
         # Data Parameters             #
         ################################
         load_mel_from_disk=False,
-        training_files='filelists/ljs_audio_text_train_filelist.txt',
-        validation_files='filelists/ljs_audio_text_val_filelist.txt',
+        training_files='data/LJSpeech-1.1/meta_train.txt',
+        validation_files='data/LJSpeech-1.1/meta_valid.txt',
         text_cleaners=['english_cleaners'],
 
         ################################

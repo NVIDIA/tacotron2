@@ -4,8 +4,8 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from layers import ConvNorm, LinearNorm
-from utils import get_mask_from_lengths
+from tacotron2.layers import ConvNorm, LinearNorm
+from tacotron2.utils import get_mask_from_lengths
 
 
 class LocationLayer(nn.Module):

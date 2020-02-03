@@ -1,10 +1,9 @@
 import torch
 
 import numpy as np
-from torch.autograd import Variable
 
-from hparams import create_hparams
-from model import Tacotron2
+from tacotron2.hparams import create_hparams
+from tacotron2.model import Tacotron2
 
 hparams = create_hparams()
 

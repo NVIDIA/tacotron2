@@ -16,6 +16,7 @@ from tacotron2.hparams import HParams
 from tacotron2.logger import Tacotron2Logger
 from tacotron2.loss_function import Tacotron2Loss
 from tacotron2.model import Tacotron2
+from tacotron2.utils import seed_everything
 
 
 def reduce_tensor(tensor, n_gpus):
@@ -163,8 +164,7 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
     if hparams.distributed_run:
         init_distributed(hparams, n_gpus, rank, group_name)
 
-    torch.manual_seed(hparams.seed)
-    torch.cuda.manual_seed(hparams.seed)
+    seed_everything(hparams.seed)
 
     model = load_model(hparams)
     learning_rate = hparams.learning_rate

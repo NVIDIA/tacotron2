@@ -38,6 +38,7 @@ class RussianPhonemeTokenizer(Tokenizer):
     @staticmethod
     def _read_phonemes_corpus(file_path: Path) -> Dict[str, List[str]]:
         """Read pre-calculated phonemes corpus (word to phonemes list map)
+
         :param file_path: Path, path to the corpus file
         :return: dict, word to phonemes dictionary
         """
@@ -51,6 +52,7 @@ class RussianPhonemeTokenizer(Tokenizer):
 
     def encode(self, text: str) -> List[int]:
         """Tokenize and encode text on phonemes-lvl
+
         :param text: str, input text
         :return: list, of phonemes ids
         """
@@ -65,6 +67,7 @@ class RussianPhonemeTokenizer(Tokenizer):
     def _tokenize(self, text: str) -> List[str]:
         """Tokenize text on phonemes. Uses dictionary if word is presented, or calculate phonemes and add new word to
         dictionary (to not to calculate next time)
+
         :param text: str, input text
         :return: list, of phonemes
         """

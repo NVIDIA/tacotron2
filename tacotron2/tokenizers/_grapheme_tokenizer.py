@@ -51,6 +51,7 @@ class GraphemeTokenizer(Tokenizer, ABC):
     @abstractmethod
     def _clean_text(self, text: str) -> str:
         """Arbitrary text cleaning pipeline which must be implemented in the children classes
+
         :param text: str, input text
         :return: str, cleaned text
         """

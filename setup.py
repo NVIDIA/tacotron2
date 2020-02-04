@@ -1,8 +1,5 @@
 from pathlib import Path
-
 from setuptools import find_packages, setup
-from setuptools.command.develop import develop
-from setuptools.command.install import install
 
 THIS_DIR = Path(__file__).parent
 

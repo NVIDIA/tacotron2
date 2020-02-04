@@ -46,3 +46,7 @@ def seed_everything(seed):
         torch.manual_seed(seed)
         torch.cuda.manual_seed(seed)
         torch.backends.cudnn.deterministic = True
+
+
+def flatten(l):
+    return [item for sublist in l for item in sublist]

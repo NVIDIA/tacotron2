@@ -30,6 +30,10 @@ setup(
         "librosa==0.7.2",
         "pillow==7.0.0",
         "matplotlib==3.1.3",
-        "num2words==0.5.10"
+        "num2words==0.5.10",
+        "rnnmorph==0.4.0",
+        "lxml==4.5.0",
+        "russian_g2p @ http://github.com/nsu-ai/russian_g2p/tarball/master",
+        "dawg @ http://github.com/pytries/DAWG/tarball/master"
     ]
 )

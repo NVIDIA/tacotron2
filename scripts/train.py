@@ -128,7 +128,7 @@ def validate(model, criterion, valset, iteration, batch_size, n_gpus,
         val_sampler = DistributedSampler(valset) if distributed_run else None
         val_loader = DataLoader(valset, sampler=val_sampler, num_workers=1,
                                 shuffle=False, batch_size=batch_size,
-                                pin_memory=False, collate_fn=collate_fn)
+                                pin_memory=False, collate_fn=collate_fn, drop_last=True)
 
         val_loss = 0.0
         for i, batch in enumerate(val_loader):

@@ -1,11 +1,14 @@
-import random
+import inspect
+
 import numpy as np
 import torch
 import torch.utils.data
+from torch.utils.data import DataLoader, DistributedSampler
 
-from tacotron2 import layers
+from tacotron2.factory import Factory
+from tacotron2.hparams import HParams
+from tacotron2.layers import TacotronSTFT
 from tacotron2.utils import load_wav_to_torch, load_filepaths_and_text
-from text import text_to_sequence
 
 
 class TextMelLoader(torch.utils.data.Dataset):
@@ -14,19 +17,51 @@ class TextMelLoader(torch.utils.data.Dataset):
         2) normalizes text and converts them to sequences of one-hot vectors
         3) computes mel-spectrograms from audio files.
     """
-    def __init__(self, audiopaths_and_text, hparams):
+
+    def __init__(self, audiopaths_and_text, tokenizer: str, load_mel_from_disk: bool, max_wav_value,
+                 sampling_rate, filter_length, hop_length, win_length, n_mel_channels, mel_fmin, mel_fmax,
+                 n_frames_per_step):
+
         self.audiopaths_and_text = load_filepaths_and_text(audiopaths_and_text)
-        self.text_cleaners = hparams.text_cleaners
-        self.max_wav_value = hparams.max_wav_value
-        self.sampling_rate = hparams.sampling_rate
-        self.load_mel_from_disk = hparams.load_mel_from_disk
-        self.stft = layers.TacotronSTFT(
-            hparams.filter_length, hparams.hop_length, hparams.win_length,
-            hparams.n_mel_channels, hparams.sampling_rate, hparams.mel_fmin,
-            hparams.mel_fmax
+        self.tokenizer = Factory.get_object(f'tacotron2.tokenizers.{tokenizer}')
+
+        self.max_wav_value = max_wav_value
+        self.sampling_rate = sampling_rate
+        self.n_frames_per_step = n_frames_per_step
+        self.load_mel_from_disk = load_mel_from_disk
+
+        self.stft = TacotronSTFT(
+            filter_length=filter_length,
+            hop_length=hop_length,
+            win_length=win_length,
+            n_mel_channels=n_mel_channels,
+            sampling_rate=sampling_rate,
+            mel_fmin=mel_fmin,
+            mel_fmax=mel_fmax
         )
-        random.seed(1234)
-        random.shuffle(self.audiopaths_and_text)
+
+    @classmethod
+    def from_hparams(cls, hparams: HParams, is_valid: bool) -> 'TextMelLoader':
+        """Build class instance from hparams map
+
+        :param hparams: HParams, dictionary with parameters
+        :param is_valid: bool, get validation dataset or not (train)
+        :return: TextMelLoader, dataset instance
+        """
+        param_names = inspect.getfullargspec(TextMelLoader.__init__).args
+        params = dict()
+        for param_name in param_names:
+            if param_name == 'self':
+                continue
+            elif param_name == 'audiopaths_and_text':
+                hparam_name = 'validation_files' if is_valid else 'training_files'
+            else:
+                hparam_name = param_name
+
+            params[param_name] = hparams[hparam_name]
+
+        obj = TextMelLoader(**hparams)
+        return obj
 
     def get_mel_text_pair(self, audiopath_and_text):
         # separate filename and text
@@ -54,8 +89,8 @@ class TextMelLoader(torch.utils.data.Dataset):
 
         return melspec
 
-    def get_text(self, text):
-        text_norm = torch.IntTensor(text_to_sequence(text, self.text_cleaners))
+    def get_text(self, text: str):
+        text_norm = torch.IntTensor(self.tokenizer.encode(text))
         return text_norm
 
     def __getitem__(self, index):
@@ -64,49 +99,67 @@ class TextMelLoader(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.audiopaths_and_text)
 
+    @staticmethod
+    def get_collate_function(pad_id, n_frames_per_step):
+        def collate(batch):
+            """Collate's training batch from normalized text and mel-spectrogram"""
+            # Right zero-pad all one-hot text sequences to max input length
+            input_lengths, ids_sorted_decreasing = torch.sort(
+                torch.LongTensor([len(x[0]) for x in batch]),
+                dim=0, descending=True)
+            max_input_len = input_lengths[0]
 
-class TextMelCollate():
-    """ Zero-pads model inputs and targets based on number of frames per setep
-    """
-    def __init__(self, n_frames_per_step):
-        self.n_frames_per_step = n_frames_per_step
+            text_padded = torch.LongTensor(len(batch), max_input_len)
+            text_padded.fill_(pad_id)
+            for i in range(len(ids_sorted_decreasing)):
+                text = batch[ids_sorted_decreasing[i]][0]
+                text_padded[i, :text.size(0)] = text
 
-    def __call__(self, batch):
-        """Collate's training batch from normalized text and mel-spectrogram
-        PARAMS
-        ------
-        batch: [text_normalized, mel_normalized]
+            # Right zero-pad mel-spec
+            num_mels = batch[0][1].size(0)
+            max_target_len = max([x[1].size(1) for x in batch])
+            if max_target_len % n_frames_per_step != 0:
+                max_target_len += n_frames_per_step - max_target_len % n_frames_per_step
+                assert max_target_len % n_frames_per_step == 0
+
+            # include mel padded and gate padded
+            mel_padded = torch.FloatTensor(len(batch), num_mels, max_target_len)
+            mel_padded.zero_()
+            gate_padded = torch.FloatTensor(len(batch), max_target_len)
+            gate_padded.zero_()
+            output_lengths = torch.LongTensor(len(batch))
+            for i in range(len(ids_sorted_decreasing)):
+                mel = batch[ids_sorted_decreasing[i]][1]
+                mel_padded[i, :, :mel.size(1)] = mel
+                gate_padded[i, mel.size(1) - 1:] = 1
+                output_lengths[i] = mel.size(1)
+
+            return text_padded, input_lengths, mel_padded, gate_padded, output_lengths
+
+        return collate
+
+    def get_data_loader(self, batch_size: int, is_distributed: bool, shuffle: bool):
+        """Construct DataLoader object from the Dataset object
+
+        :param is_distributed: bool, set distributed sampler or not
+        :param batch_size: int, batch size
+        :param shuffle: bool, shuffle data or not
+        :return: DataLoader
         """
-        # Right zero-pad all one-hot text sequences to max input length
-        input_lengths, ids_sorted_decreasing = torch.sort(
-            torch.LongTensor([len(x[0]) for x in batch]),
-            dim=0, descending=True)
-        max_input_len = input_lengths[0]
 
-        text_padded = torch.LongTensor(len(batch), max_input_len)
-        text_padded.zero_()
-        for i in range(len(ids_sorted_decreasing)):
-            text = batch[ids_sorted_decreasing[i]][0]
-            text_padded[i, :text.size(0)] = text
+        sampler = DistributedSampler(self, shuffle=shuffle) if is_distributed else None
+        shuffle = shuffle if sampler is None else False
 
-        # Right zero-pad mel-spec
-        num_mels = batch[0][1].size(0)
-        max_target_len = max([x[1].size(1) for x in batch])
-        if max_target_len % self.n_frames_per_step != 0:
-            max_target_len += self.n_frames_per_step - max_target_len % self.n_frames_per_step
-            assert max_target_len % self.n_frames_per_step == 0
+        collate_fn = self.get_collate_function(pad_id=self.tokenizer.pad_id, n_frames_per_step=self.n_frames_per_step)
+        dataloader = DataLoader(
+            self,
+            num_workers=1,
+            sampler=sampler,
+            batch_size=batch_size,
+            pin_memory=False,
+            drop_last=True,
+            collate_fn=collate_fn,
+            shuffle=shuffle
+        )
 
-        # include mel padded and gate padded
-        mel_padded = torch.FloatTensor(len(batch), num_mels, max_target_len)
-        mel_padded.zero_()
-        gate_padded = torch.FloatTensor(len(batch), max_target_len)
-        gate_padded.zero_()
-        output_lengths = torch.LongTensor(len(batch))
-        for i in range(len(ids_sorted_decreasing)):
-            mel = batch[ids_sorted_decreasing[i]][1]
-            mel_padded[i, :, :mel.size(1)] = mel
-            gate_padded[i, mel.size(1)-1:] = 1
-            output_lengths[i] = mel.size(1)
-
-        return text_padded, input_lengths, mel_padded, gate_padded, \
-            output_lengths
+        return dataloader

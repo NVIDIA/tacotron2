@@ -29,6 +29,7 @@ setup(
         "tqdm==4.36.1",
         "librosa==0.7.2",
         "pillow==7.0.0",
-        "matplotlib==3.1.3"
+        "matplotlib==3.1.3",
+        "num2words==0.5.10"
     ]
 )

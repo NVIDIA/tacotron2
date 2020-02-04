@@ -2,7 +2,7 @@
 # Experiment Parameters        #
 ################################
 epochs: 500
-iters_per_checkpoint: 3
+iters_per_checkpoint: 10000
 seed: 1234
 dynamic_loss_scaling: True
 fp16_run: False
@@ -19,7 +19,7 @@ ignore_layers: ['embedding.weight']
 load_mel_from_disk: False
 training_files: '../data/LJSpeech-1.1/meta_train.txt'
 validation_files: '../data/LJSpeech-1.1/meta_valid.txt'
-text_cleaners: ['english_cleaners']
+tokenizer: 'RussianGraphemeTokenizer'
 
 ################################
 # Audio Parameters             #
@@ -73,5 +73,5 @@ use_saved_learning_rate: False
 learning_rate: 1e-3
 weight_decay: 1e-6
 grad_clip_thresh: 1.0
-batch_size: 2
+batch_size: 12
 mask_padding: True  # set model's padded outputs to padded values

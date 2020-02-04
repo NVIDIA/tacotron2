@@ -1,9 +1,10 @@
-from tacotron2.hparams import create_hparams
+from pathlib import Path
+
+from tacotron2.hparams import HParams
 from tacotron2.model import Tacotron2
 from tacotron2.utils import to_device
-from train import prepare_dataloaders
 
-hparams = create_hparams()
+hparams = HParams.from_yaml(Path('../configs/hparams.default.json'))
 
 if __name__ == '__main__':
     device = 'cuda'

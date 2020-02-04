@@ -1,20 +1,21 @@
-import os
-import time
 import argparse
 import math
-from numpy import finfo
+import os
+import time
+from pathlib import Path
 
 import torch
-from tacotron2.distributed import apply_gradient_allreduce
 import torch.distributed as dist
-from torch.utils.data.distributed import DistributedSampler
+from numpy import finfo
 from torch.utils.data import DataLoader
+from torch.utils.data.distributed import DistributedSampler
 
-from tacotron2.model import Tacotron2
 from tacotron2.data_utils import TextMelLoader, TextMelCollate
-from tacotron2.loss_function import Tacotron2Loss
+from tacotron2.distributed import apply_gradient_allreduce
+from tacotron2.hparams import HParams
 from tacotron2.logger import Tacotron2Logger
-from tacotron2.hparams import create_hparams
+from tacotron2.loss_function import Tacotron2Loss
+from tacotron2.model import Tacotron2
 
 
 def reduce_tensor(tensor, n_gpus):
@@ -104,7 +105,7 @@ def load_checkpoint(checkpoint_path, model, optimizer):
     optimizer.load_state_dict(checkpoint_dict['optimizer'])
     learning_rate = checkpoint_dict['learning_rate']
     iteration = checkpoint_dict['iteration']
-    print("Loaded checkpoint '{}' from iteration {}" .format(
+    print("Loaded checkpoint '{}' from iteration {}".format(
         checkpoint_path, iteration))
     return model, optimizer, learning_rate, iteration
 
@@ -257,25 +258,18 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-o', '--output_directory', type=str,
-                        help='directory to save checkpoints')
-    parser.add_argument('-l', '--log_directory', type=str,
-                        help='directory to save tensorboard logs')
-    parser.add_argument('-c', '--checkpoint_path', type=str, default=None,
-                        required=False, help='checkpoint path')
-    parser.add_argument('--warm_start', action='store_true',
-                        help='load model weights only, ignore specified layers')
-    parser.add_argument('--n_gpus', type=int, default=1,
-                        required=False, help='number of gpus')
-    parser.add_argument('--rank', type=int, default=0,
-                        required=False, help='rank of current gpu')
-    parser.add_argument('--group_name', type=str, default='group_name',
-                        required=False, help='Distributed group name')
-    parser.add_argument('--hparams', type=str,
-                        required=False, help='comma separated name=value pairs')
+    parser.add_argument('-o', '--output_directory', type=str, help='Directory to save checkpoints')
+    parser.add_argument('-l', '--log_directory', type=str, help='Directory to save tensorboard logs')
+    parser.add_argument('-c', '--checkpoint_path', type=str, default=None, required=False, help='Checkpoint path')
+    parser.add_argument('--warm_start', action='store_true', help='Load model weights only, ignore specified layers')
+    parser.add_argument('--n_gpus', type=int, default=1, required=False, help='Number of gpus')
+    parser.add_argument('--rank', type=int, default=0, required=False, help='Rank of current gpu')
+    parser.add_argument('--group_name', type=str, default='group_name', required=False, help='Distributed group name')
+    parser.add_argument('--hparams_file', type=Path, required=False, help='Path to the hyper parameters yaml file')
 
     args = parser.parse_args()
-    hparams = create_hparams(args.hparams)
+
+    hparams = HParams.from_yaml(args.hparams_file)
 
     torch.backends.cudnn.enabled = hparams.cudnn_enabled
     torch.backends.cudnn.benchmark = hparams.cudnn_benchmark

@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from setuptools import find_packages, setup
 
 THIS_DIR = Path(__file__).parent
@@ -9,7 +10,6 @@ def get_version(filename):
     with open(filename) as f:
         metadata = dict(findall("__([a-z]+)__ = '([^']+)'", f.read()))
     return metadata['version']
-
 
 
 setup(

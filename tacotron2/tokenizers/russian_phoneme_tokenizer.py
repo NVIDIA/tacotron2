@@ -31,12 +31,12 @@ class RussianPhonemeTokenizer(Tokenizer):
         self.id2token = [self.pad, self.unk] + self.russian_phonemes + [' ']
         self.token2id = {token: id_ for id_, token in enumerate(self.id2token)}
 
-        self.word2phonemes = self.read_phonemes_corpus(Path(__file__).parent / 'data/russian_phonemes_corpus.txt')
+        self.word2phonemes = self._read_phonemes_corpus(Path(__file__).parent / 'data/russian_phonemes_corpus.txt')
         self.word_regexp = re.compile(r'[А-яЁё]+')
         self.transcriptor = Transcription()
 
     @staticmethod
-    def read_phonemes_corpus(file_path: Path) -> Dict[str, List[str]]:
+    def _read_phonemes_corpus(file_path: Path) -> Dict[str, List[str]]:
         """Read pre-calculated phonemes corpus (word to phonemes list map)
         :param file_path: Path, path to the corpus file
         :return: dict, word to phonemes dictionary

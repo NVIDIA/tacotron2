@@ -60,7 +60,7 @@ class TextMelLoader(torch.utils.data.Dataset):
 
             params[param_name] = hparams[hparam_name]
 
-        obj = TextMelLoader(**hparams)
+        obj = TextMelLoader(**params)
         return obj
 
     def get_mel_text_pair(self, audiopath_and_text):

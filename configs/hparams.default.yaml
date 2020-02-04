@@ -19,7 +19,7 @@ ignore_layers: ['embedding.weight']
 load_mel_from_disk: False
 training_files: '../data/LJSpeech-1.1/meta_train.txt'
 validation_files: '../data/LJSpeech-1.1/meta_valid.txt'
-tokenizer: 'RussianGraphemeTokenizer'
+tokenizer: 'EnglishGraphemeTokenizer'
 
 ################################
 # Audio Parameters             #

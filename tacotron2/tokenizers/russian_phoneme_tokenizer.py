@@ -14,6 +14,8 @@ class RussianPhonemeTokenizer(Tokenizer):
     """Russian phonemes-lvl tokenizer
     It uses pre-calculated phonemes dictionary. If some specific word is not in the dictionary, then the
     russian_g2p.Transcription will be applied (https://github.com/nsu-ai/russian_g2p)
+
+    This tokenizer ignores all punctuation and not-russian-symbol words
     """
 
     @property

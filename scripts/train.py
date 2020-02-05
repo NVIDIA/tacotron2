@@ -150,6 +150,9 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
 
     seed_everything(hparams.seed)
 
+    train_dataloader, valid_dataloader = prepare_dataloaders(hparams)
+    hparams.n_symbols = len(train_dataloader.dataset.tokenizer.id2token)
+
     model = load_model(hparams)
     learning_rate = hparams.learning_rate
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate,
@@ -167,8 +170,6 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
 
     logger = prepare_directories_and_logger(
         output_directory, log_directory, rank)
-
-    train_dataloader, valid_dataloader = prepare_dataloaders(hparams)
 
     # Load checkpoint if one exists
     iteration = 0

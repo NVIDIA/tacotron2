@@ -36,7 +36,6 @@ mel_fmax: 8000.0
 ################################
 # Model Parameters             #
 ################################
-n_symbols: 148
 symbols_embedding_dim: 512
 
 # Encoder parameters

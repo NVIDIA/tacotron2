@@ -8,7 +8,7 @@ import torch
 import torch.distributed as dist
 from numpy import finfo
 
-from tacotron2.data_utils import TextMelLoader
+from tacotron2.datasets.TextMelLoader import TextMelLoader
 from tacotron2.distributed import apply_gradient_allreduce
 from tacotron2.hparams import HParams
 from tacotron2.logger import Tacotron2Logger

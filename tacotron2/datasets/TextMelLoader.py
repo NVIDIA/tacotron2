@@ -1,4 +1,5 @@
 import inspect
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -12,18 +13,36 @@ from tacotron2.utils import load_wav_to_torch, load_filepaths_and_text
 
 
 class TextMelLoader(torch.utils.data.Dataset):
-    """
-        1) loads audio,text pairs
-        2) normalizes text and converts them to sequences of one-hot vectors
-        3) computes mel-spectrograms from audio files.
+    """Texts and mel-spectrograms dataset
+    1) loads audio,text pairs
+    2) normalizes text and converts them to sequences of one-hot vectors
+    3) computes mel-spectrograms from audio files.
     """
 
-    def __init__(self, audiopaths_and_text, tokenizer: str, load_mel_from_disk: bool, max_wav_value,
-                 sampling_rate, filter_length, hop_length, win_length, n_mel_channels, mel_fmin, mel_fmax,
+    def __init__(self, meta_file_path: Path, tokenizer_class_name: str, load_mel_from_disk: bool, max_wav_value,
+                 sampling_rate,  filter_length, hop_length, win_length, n_mel_channels, mel_fmin, mel_fmax,
                  n_frames_per_step):
+        """
+        :param meta_file_path: Path, value separated text meta-file which has two fields:
+            - relative (from the meta-file itself) path to the wav audio sample
+            - audio sample text
+            Fields must be separated by '|' symbol
+        :param tokenizer_class_name: str, tokenizer class name. Must be importable from tacotron2.tokenizers module.
+            If you have implemented custom tokenizer, add it's import to tacotron2.tokenizers.__init__.py file
+        :param load_mel_from_disk:
+        :param max_wav_value:
+        :param sampling_rate:
+        :param filter_length:
+        :param hop_length:
+        :param win_length:
+        :param n_mel_channels:
+        :param mel_fmin:
+        :param mel_fmax:
+        :param n_frames_per_step:
+        """
 
-        self.audiopaths_and_text = load_filepaths_and_text(audiopaths_and_text)
-        self.tokenizer = Factory.get_object(f'tacotron2.tokenizers.{tokenizer}')
+        self.audiopaths_and_text = load_filepaths_and_text(meta_file_path)
+        self.tokenizer = Factory.get_object(f'tacotron2.tokenizers.{tokenizer_class_name}')
 
         self.max_wav_value = max_wav_value
         self.sampling_rate = sampling_rate
@@ -43,7 +62,8 @@ class TextMelLoader(torch.utils.data.Dataset):
     @classmethod
     def from_hparams(cls, hparams: HParams, is_valid: bool) -> 'TextMelLoader':
         """Build class instance from hparams map
-
+        If you create dataset instance via this method, make sure, that meta_train.txt (if is_valid==False) or
+            meta_valid.txt (is is_valid==True) exists in the dataset directory
         :param hparams: HParams, dictionary with parameters
         :param is_valid: bool, get validation dataset or not (train)
         :return: TextMelLoader, dataset instance
@@ -53,12 +73,16 @@ class TextMelLoader(torch.utils.data.Dataset):
         for param_name in param_names:
             if param_name == 'self':
                 continue
-            elif param_name == 'audiopaths_and_text':
-                hparam_name = 'validation_files' if is_valid else 'training_files'
+            elif param_name == 'meta_file_path':
+                data_directory = Path(hparams.data_directory)
+                postfix = 'valid' if is_valid else 'train'
+                value = data_directory / f'meta_{postfix}.txt'
+                if not value.is_file():
+                    raise FileNotFoundError(f"Can't find {str(value)} file. Make sure, that file exists")
             else:
-                hparam_name = param_name
+                value = hparams[param_name]
 
-            params[param_name] = hparams[hparam_name]
+            params[param_name] = value
 
         obj = TextMelLoader(**params)
         return obj

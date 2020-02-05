@@ -19,9 +19,10 @@ def load_wav_to_torch(full_path):
     return torch.FloatTensor(data), sampling_rate
 
 
-def load_filepaths_and_text(filename, split="|"):
-    root_dir = Path(filename).parent
-    with open(filename, encoding='utf-8') as f:
+def load_filepaths_and_text(meta_file_path: Path, split="|"):
+    meta_file_path = Path(meta_file_path)
+    root_dir = meta_file_path.parent
+    with meta_file_path.open(encoding='utf-8') as f:
         filepaths_and_text = [line.strip().split(split) for line in f]
         filepaths_and_text = [[str(root_dir / x[0]), x[1]] for x in filepaths_and_text]
 

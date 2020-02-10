@@ -7,6 +7,12 @@ from plotting_utils import plot_gate_outputs_to_numpy
 
 class Tacotron2Logger(SummaryWriter):
     def __init__(self, logdir):
+        ## logdir = logdir / current time _ hostname
+        import socket, os
+        from datetime import datetime
+        current_time = datetime.now().strftime('%b%d_%H-%M-%S')
+        logdir = os.path.join(logdir, current_time + '_' + socket.gethostname())
+
         super(Tacotron2Logger, self).__init__(logdir)
 
     def log_training(self, reduced_loss, grad_norm, learning_rate, duration,

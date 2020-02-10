@@ -27,7 +27,7 @@ class Tacotron2Logger(SummaryWriter):
             self.add_histogram(tag, value.data.cpu().numpy(), iteration)
 
         # plot alignment, mel target and predicted, gate target and predicted
-        idx = random.randint(0, alignments.size(0) - 1)
+        idx = 0 # random.randint(0, alignments.size(0) - 1)
         self.add_image(
             "alignment",
             plot_alignment_to_numpy(alignments[idx].data.cpu().numpy().T),

@@ -1,1 +1,4 @@
 __pycache__
+build/
+dist/
+tacotron2.egg-info/

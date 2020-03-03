@@ -1,11 +1,11 @@
-import tensorflow as tf
+from easydict import EasyDict
 from text import symbols
 
 
 def create_hparams(hparams_string=None, verbose=False):
     """Create model hyperparameters. Parse nondefault from given string."""
 
-    hparams = tf.contrib.training.HParams(
+    hparams = EasyDict(
         ################################
         # Experiment Parameters        #
         ################################
@@ -19,7 +19,7 @@ def create_hparams(hparams_string=None, verbose=False):
         dist_url="tcp://localhost:54321",
         cudnn_enabled=True,
         cudnn_benchmark=False,
-        ignore_layers=['embedding.weight'],
+        ignore_layers=['embedding.weight', 'latent_encoder'],
 
         ################################
         # Data Parameters             #
@@ -44,13 +44,21 @@ def create_hparams(hparams_string=None, verbose=False):
         ################################
         # Model Parameters             #
         ################################
-        n_symbols=len(symbols),
+        n_symbols=256, # UTF-8
         symbols_embedding_dim=512,
 
         # Encoder parameters
         encoder_kernel_size=5,
         encoder_n_convolutions=3,
         encoder_embedding_dim=512,
+        
+        # Latent-Encoder parameters
+        latent_kernel_size=3,
+        latent_n_convolutions=2,
+        latent_conv_filters=512,
+        latent_lstm_dim=256,
+        latent_embedding_dim=2,
+        latent_expand_dim=32,
 
         # Decoder parameters
         n_frames_per_step=1,  # currently only 1 is supported
@@ -81,15 +89,15 @@ def create_hparams(hparams_string=None, verbose=False):
         learning_rate=1e-3,
         weight_decay=1e-6,
         grad_clip_thresh=1.0,
-        batch_size=64,
+        batch_size=32,
         mask_padding=True  # set model's padded outputs to padded values
     )
 
-    if hparams_string:
-        tf.logging.info('Parsing command line hparams: %s', hparams_string)
-        hparams.parse(hparams_string)
+#     if hparams_string:
+#         tf.logging.info('Parsing command line hparams: %s', hparams_string)
+#         hparams.parse(hparams_string)
 
-    if verbose:
-        tf.logging.info('Final parsed hparams: %s', hparams.values())
+#     if verbose:
+#         tf.logging.info('Final parsed hparams: %s', hparams.values())
 
     return hparams

@@ -304,7 +304,7 @@ class Decoder(nn.Module):
         decoder_inputs = decoder_inputs.view(
             decoder_inputs.size(0),
             int(decoder_inputs.size(1)/self.n_frames_per_step), -1)
-        # (B, T_out, n_mel_channels) -> (T_out, B, n_mel_channels)
+        # (B, T_out/n_frames_ps, n_mel_channels*n_frames_ps) -> (T_out/n_frames_ps, B, n_mel_channels*n_frames_ps)
         decoder_inputs = decoder_inputs.transpose(0, 1)
         return decoder_inputs
 

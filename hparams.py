@@ -83,6 +83,14 @@ def create_hparams(hparams_string=None, verbose=False):
         grad_clip_thresh=1.0,
         batch_size=64,
         mask_padding=True  # set model's padded outputs to padded values
+
+        ###############################
+        # Speaker and Lang Embeddings #
+        ###############################
+        speaker_embedding_dim = 64
+        lang_embedding_dim = 3
+        n_langs = 2
+        n_speakers = 6
     )
 
     if hparams_string:

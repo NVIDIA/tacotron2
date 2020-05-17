@@ -72,7 +72,7 @@ We are thankful to the Tacotron 2 paper authors, specially Jonathan Shen, Yuxuan
 Wang and Zongheng Yang.
 
 
-[WaveGlow]: https://drive.google.com/file/d/1WsibBTsuRg_SF2Z6L6NFRTT-NjEy1oTx/view?usp=sharing
+[WaveGlow]: https://drive.google.com/open?id=1rpK8CzAAirq9sWZhe9nlfvxMF1dRgFbF
 [Tacotron 2]: https://drive.google.com/file/d/1c5ZTuT7J08wLUoVZ2KkUs_VdZuJ86ZqA/view?usp=sharing
 [pytorch 1.0]: https://github.com/pytorch/pytorch#installation
 [website]: https://nv-adlr.github.io/WaveGlow

@@ -1,9 +1,40 @@
 import torch
+import numpy as np
 from librosa.filters import mel as librosa_mel_fn
 from audio_processing import dynamic_range_compression
 from audio_processing import dynamic_range_decompression
 from stft import STFT
 
+def dct(x, norm=None):
+    """
+    Discrete Cosine Transform, Type II (a.k.a. the DCT)
+    For the meaning of the parameter `norm`, see:
+    https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.fftpack.dct.html
+    :param x: the input signal
+    :param norm: the normalization, None or 'ortho'
+    :return: the DCT-II of the signal over the last dimension
+    """
+    x_shape = x.shape
+    N = x_shape[-1]
+    x = x.contiguous().view(-1, N)
+
+    v = torch.cat([x[:, ::2], x[:, 1::2].flip([1])], dim=1)
+
+    Vc = torch.rfft(v, 1, onesided=False)
+
+    k = - torch.arange(N, dtype=x.dtype, device=x.device)[None, :] * np.pi / (2 * N)
+    W_r = torch.cos(k)
+    W_i = torch.sin(k)
+
+    V = Vc[:, :, 0] * W_r - Vc[:, :, 1] * W_i
+
+    if norm == 'ortho':
+        V[:, 0] /= np.sqrt(N) * 2
+        V[:, 1:] /= np.sqrt(N / 2) * 2
+
+    V = 2 * V.view(*x_shape)
+
+    return V
 
 class LinearNorm(torch.nn.Module):
     def __init__(self, in_dim, out_dim, bias=True, w_init_gain='linear'):
@@ -59,6 +90,11 @@ class TacotronSTFT(torch.nn.Module):
     def spectral_de_normalize(self, magnitudes):
         output = dynamic_range_decompression(magnitudes)
         return output
+
+    def cepstrum_from_mel(self, mel):
+        #magnitudes = self.spectral_de_normalize(mel)
+        mcc = dct(mel,'ortho')
+        return mcc
 
     def mel_spectrogram(self, y):
         """Computes mel-spectrograms from a batch of waves

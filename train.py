@@ -15,7 +15,8 @@ from data_utils import TextMelLoader, TextMelCollate
 from loss_function import Tacotron2Loss
 from logger import Tacotron2Logger
 from hparams import create_hparams
-
+from metric import alignment_metric, evaluation_metrics
+import layers
 
 def reduce_tensor(tensor, n_gpus):
     rt = tensor.clone()
@@ -119,7 +120,7 @@ def save_checkpoint(model, optimizer, learning_rate, iteration, filepath):
 
 
 def validate(model, criterion, valset, iteration, batch_size, n_gpus,
-             collate_fn, logger, distributed_run, rank):
+             collate_fn, logger, distributed_run, rank, stft):
     """Handles all the validation scoring and printing"""
     model.eval()
     with torch.no_grad():
@@ -129,21 +130,38 @@ def validate(model, criterion, valset, iteration, batch_size, n_gpus,
                                 pin_memory=False, collate_fn=collate_fn)
 
         val_loss = 0.0
+        diagonality = torch.zeros(1)
+        avg_prob = torch.zeros(1)
+        avg_MCD = torch.zeros(1)
+        avg_f0 = torch.zeros(1)
         for i, batch in enumerate(val_loader):
             x, y = model.parse_batch(batch)
             y_pred = model(x)
+            _, input_lengths, mel_padded, _, output_lengths = x
+            _, mel_outputs_postnet, _, alignments = y_pred
             loss = criterion(y_pred, y)
             if distributed_run:
                 reduced_val_loss = reduce_tensor(loss.data, n_gpus).item()
             else:
                 reduced_val_loss = loss.item()
             val_loss += reduced_val_loss
+            rate, prob = alignment_metric(alignments, input_lengths, output_lengths)
+            MCD, f0 = evaluation_metrics(stft, mel_padded, mel_outputs_postnet)
+            diagonality += rate
+            avg_prob += prob
+            avg_MCD += MCD
+            avg_f0 += f0
+        diagonality=diagonality / (i + 1)
+        avg_prob = avg_prob / (i + 1)
         val_loss = val_loss / (i + 1)
+        avg_MCD = avg_MCD / (i + 1)
+        avg_f0 = avg_f0 / (i + 1)
 
     model.train()
     if rank == 0:
         print("Validation loss {}: {:9f}  ".format(iteration, val_loss))
-        logger.log_validation(val_loss, model, y, y_pred, iteration)
+        logger.log_validation(val_loss, model, y, y_pred, diagonality, avg_prob, avg_MCD, avg_f0, iteration)
+
 
 
 def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
@@ -159,6 +177,11 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
     rank (int): rank of current gpu
     hparams (object): comma separated list of "name=value" pairs.
     """
+    stft = layers.TacotronSTFT(
+        hparams.filter_length, hparams.hop_length, hparams.win_length,
+        hparams.n_mel_channels, hparams.sampling_rate, hparams.mel_fmin,
+        hparams.mel_fmax)
+
     if hparams.distributed_run:
         init_distributed(hparams, n_gpus, rank, group_name)
 
@@ -214,11 +237,15 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
             x, y = model.parse_batch(batch)
             y_pred = model(x)
 
+            _, input_lengths, mel_padded, _, output_lengths = x
+            _, mel_outputs_postnet, _, alignments = y_pred
+
             loss = criterion(y_pred, y)
             if hparams.distributed_run:
                 reduced_loss = reduce_tensor(loss.data, n_gpus).item()
             else:
                 reduced_loss = loss.item()
+
             if hparams.fp16_run:
                 with amp.scale_loss(loss, optimizer) as scaled_loss:
                     scaled_loss.backward()
@@ -239,13 +266,17 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
                 duration = time.perf_counter() - start
                 print("Train loss {} {:.6f} Grad Norm {:.6f} {:.2f}s/it".format(
                     iteration, reduced_loss, grad_norm, duration))
-                logger.log_training(
-                    reduced_loss, grad_norm, learning_rate, duration, iteration)
+                if (i % (hparams.iters_per_checkpoint / 10) == 0):
+                    with torch.no_grad():
+                        diagonality, avg_prob = alignment_metric(alignments, input_lengths, output_lengths)
+                        avg_MCD, avg_f0 = evaluation_metrics(stft, mel_padded, mel_outputs_postnet)
+                    logger.log_training(
+                        reduced_loss, grad_norm, learning_rate, duration, diagonality, avg_prob, avg_MCD, avg_f0, iteration)
 
             if not is_overflow and (iteration % hparams.iters_per_checkpoint == 0):
                 validate(model, criterion, valset, iteration,
                          hparams.batch_size, n_gpus, collate_fn, logger,
-                         hparams.distributed_run, rank)
+                         hparams.distributed_run, rank, stft)
                 if rank == 0:
                     checkpoint_path = os.path.join(
                         output_directory, "checkpoint_{}".format(iteration))

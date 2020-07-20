@@ -1,4 +1,4 @@
 [submodule "waveglow"]
 	path = waveglow
-	url = https://github.com/NVIDIA/waveglow
-	branch = master
+	url = https://github.com/lokkelvin2/waveglow_GUI
+	branch = gui

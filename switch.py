@@ -1,3 +1,4 @@
+# Taken from https://stackoverflow.com/a/51825815
 from PyQt5.QtCore import QPropertyAnimation, QRectF, QSize, Qt, pyqtProperty
 from PyQt5.QtGui import QPainter
 from PyQt5.QtWidgets import (
@@ -169,6 +170,7 @@ def main():
     # Thumb size > track size (Android style)
     s3 = Switch(thumb_radius=11, track_radius=8)
     s4 = Switch(thumb_radius=8, track_radius=10, show_text = False)
+
     #s4.setEnabled(False)
 
     l = QHBoxLayout()

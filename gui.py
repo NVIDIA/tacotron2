@@ -1,10 +1,11 @@
 import sys
 from PyQt5 import Qt
 from PyQt5 import QtCore,QtGui
-from PyQt5.QtCore import QMutex, QObject, QRunnable, pyqtSignal, pyqtSlot, QThreadPool, QTimer
+from PyQt5.QtCore import QMutex, QObject, QRunnable, pyqtSignal, pyqtSlot, QThreadPool, QTimer, QThread
 from PyQt5.QtWidgets import QWidget,QMainWindow,QHeaderView, QMessageBox, QFileDialog
 from nvidia_tacotron_TTS_Layout import Ui_MainWindow
 from switch import Switch
+from timerthread import timerThread
 
 import time
 import requests
@@ -131,6 +132,8 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.model = None
         self.waveglow = None
         self.hparams = None
+        self.current_thread = None
+        self.t_1 = None
 
         self.TTModelCombo.currentIndexChanged.connect(self.set_reload_model_flag)
         self.WGModelCombo.currentIndexChanged.connect(self.set_reload_model_flag)
@@ -327,6 +330,7 @@ class GUI(QMainWindow, Ui_MainWindow):
 
     def set_cuda(self):
         self.use_cuda = self.GpuSwitch.isChecked()
+        self.reload_model_flag = True
 
     def startup_update(self):
         if not self.tab_2.isEnabled():
@@ -338,7 +342,6 @@ class GUI(QMainWindow, Ui_MainWindow):
         fpath = str(QFileDialog.getOpenFileName(self, 
                                             'Select Tacotron2 model', 
                                             filter='*.pt')[0])
-        print(fpath)
         if not fpath: # If no folder selected
             return
         if fpath not in self.TTmodel_dir:
@@ -384,19 +387,19 @@ class GUI(QMainWindow, Ui_MainWindow):
             self.logs[-1] += line
         elif mode == "overwrite":
             self.logs[-1] = line
+        elif mode == "clear":
+            self.logs = [line]
         log_text = '\n'.join(self.logs)
         
         self.log_window1.setText(log_text)
-        self.app.processEvents()
+        #self.app.processEvents()
 
     def playback_wav(self,wav):
         if self.tabWidget.currentIndex()==0:
             self.TTSSkipButton.setEnabled(True)
         else:
             self.ClientSkipBtn.setEnabled(True)
-        print(wav.dtype)
         if wav.dtype != np.int16 :
-            print('\n float32')
             # Convert from float32 or float16 to signed int16 for pygame
             wav = (wav/np.amax(wav) * 32767).astype(np.int16)
         sound = pygame.mixer.Sound(wav)
@@ -436,42 +439,61 @@ class GUI(QMainWindow, Ui_MainWindow):
     def start_synthesis(self):
         # Runs in main gui thread. Synthesize blocks gui.
         # Can update gui directly in this function.
+        self.t_1 = time.time()
         self.TTSDialogButton.setDisabled(True)
         self.TTModelCombo.setDisabled(True)
         self.WGModelCombo.setDisabled(True)
         self.TTSTextEdit.setDisabled(True)
         self.LoadTTButton.setDisabled(True)
+        self.LoadWGButton.setDisabled(True)
+        self.tab_2.setDisabled(True)
         self.update_log_bar(0)
-        self.update_log_window('Initializing')
+        self.update_log_window('Initializing','clear')
         self.update_status_bar("Creating voice")
         # We use a signal callback here to stick to the same params type in synthesize.py
         if self.reload_model_flag: 
-            self.reload_model()
-        
+            self.reload_model()  
+            self.reload_model_flag = False
         # Prepare text input
         text = self.TTSTextEdit.toPlainText()
         sequence = np.array(text_to_sequence(text, ['english_cleaners']))[None, :]
-        device = torch.device('cuda' if self.use_cuda else 'cpu')
-        sequence = torch.autograd.Variable(
-            torch.from_numpy(sequence)).to(device).long()
-        # Decode text input
-        mel_outputs, mel_outputs_postnet, _, alignments = self.model.inference(sequence)
-        # Synthesize audio from spectrogram using WaveGlow
-        with torch.no_grad():
-            audio = self.waveglow.infer(mel_outputs_postnet, sigma=0.666)
+        self.current_thread = inferThread(sequence,
+                                        self.use_cuda,
+                                        self.model,
+                                        self.waveglow, 
+                                        self.signals.progress, 
+                                        None,
+                                        self.t_1,
+                                        parent = self)
+        self.current_thread.audioSignal.connect(self.on_inferThread_audio)
+        self.current_thread.timeElapsed.connect(self.print_elapsed)
+
+    @pyqtSlot(np.ndarray)    
+    def on_inferThread_audio(self,wav):
         #audio_denoised = denoiser(audio, strength=0.01)[:, 0]
         #wav = audio_denoised.cpu().numpy()
-        wav = audio[0].data.cpu().numpy()
         self.playback_wav(wav)
-        self.update_log_window('Done')
         self.TTSDialogButton.setEnabled(True)
         self.TTModelCombo.setEnabled(True)
         self.WGModelCombo.setEnabled(True)
         self.TTSTextEdit.setEnabled(True)
         self.LoadTTButton.setEnabled(True)
+        self.LoadWGButton.setEnabled(True)
+        self.tab_2.setEnabled(True)
+        elapsed = (time.time() - self.t_1)
+        wav_length = (len(wav) / self.hparams.sampling_rate)
+        rtf = elapsed / wav_length
+        line = 'Generated {:.1f}s of audio in {:.1f}s ({:.2f} real-time factor)'.format(wav_length,elapsed,rtf)
+        self.update_log_window(line,'overwrite')
+        tps = elapsed / len(wav)
+        print(wav.shape)
+        print(" > Run-time: {}".format(elapsed))
+        print(" > Real-time factor: {}".format(rtf))
+        print(" > Time per step: {}".format(tps))
         self.update_status_bar("Ready")
-        # TODO get pygame mixer callback on end or use sounddevice
         
+        # TODO get pygame mixer callback on end or use sounddevice
+
     def update_log_window_2(self, line, mode="newline"):
         if mode == "newline" or not self.logs2:
             self.logs2.append(line)
@@ -530,7 +552,39 @@ class GUI(QMainWindow, Ui_MainWindow):
     def get_min_donation(self):
         return float(self.ClientAmountLine.value())
 
-  
+class inferThread(QThread):
+    timeElapsed = pyqtSignal(int)
+    audioSignal = pyqtSignal(np.ndarray)
+
+    def __init__(self, sequence, use_cuda, model, waveglow, 
+                progress, elapsed, timestart, parent=None):
+        super(inferThread, self).__init__(parent)
+        self.sequence = sequence
+        self.use_cuda = use_cuda
+        self.model = model
+        self.waveglow = waveglow
+        self.progress = progress
+        self.elapsed = elapsed
+        self.timeoffset = time.time()-timestart
+        self.timerThread = timerThread(self.timeoffset, parent = self)
+        self.timerThread.timeElapsed.connect(self.timeElapsed.emit)
+        self.start()
+
+    def run(self):
+        self.timerThread.start(time.time())
+        device = torch.device('cuda' if self.use_cuda else 'cpu')
+        self.sequence = torch.autograd.Variable(
+            torch.from_numpy(self.sequence)).to(device).long()
+        # Decode text input
+        mel_outputs, mel_outputs_postnet, _, alignments = self.model.inference(self.sequence)
+        with torch.no_grad():
+            audio = self.waveglow.infer(mel_outputs_postnet, 
+                                    sigma=0.666,
+                                    progress_callback = self.progress,
+                                    elapsed_callback = self.elapsed)
+            wav = audio[0].data.cpu().numpy()
+        self.audioSignal.emit(wav)
+        
 
 if __name__ == '__main__':
     app = Qt.QApplication(sys.argv)

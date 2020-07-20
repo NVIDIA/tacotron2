@@ -7,6 +7,6 @@ scipy
 Unidecode
 pillow
 pygame
-pyqt5
+pyqt5==5.15.0
 numba==0.48
 tqdm

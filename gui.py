@@ -123,17 +123,17 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.setWindowTitle("Tacotron2 + Waveglow GUI v%s" %0.1)
         
         self.GpuSwitch = Switch(thumb_radius=8, track_radius=10, show_text = False)
+        self.horizontalLayout.addWidget(self.GpuSwitch)
         self.GpuSwitch.setEnabled = torch.cuda.is_available()
         self.use_cuda = False
-        self.GpuSwitch.toggled.connect(lambda : self.use_cuda = self.GpuSwitch.isChecked())
+        self.GpuSwitch.toggled.connect(self.set_cuda)
 
         self.model = None
         self.waveglow = None
         self.hparams = None
-        
-        self.reload_model_flag = True
-        self.TTModelCombo.currentIndexChanged.connect(lambda : self.reload_model_flag = True)
-        self.WGModelCombo.currentIndexChanged.connect(lambda : self.reload_model_flag = True)
+
+        self.TTModelCombo.currentIndexChanged.connect(self.set_reload_model_flag)
+        self.WGModelCombo.currentIndexChanged.connect(self.set_reload_model_flag)
         self.TTSDialogButton.clicked.connect(self.start_synthesis)
         self.TTSSkipButton.clicked.connect(self.skip_wav)
         self.TTSSkipButton.setDisabled(True)
@@ -144,7 +144,7 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.max_log2_lines = 100
         self.TTmodel_dir = [] # Stores list of paths
         self.WGmodel_dir = []
-        
+        self.reload_model_flag = True
         
         # Because of bug in streamelements timestamp filter, need 2 variables for previous time
         
@@ -322,6 +322,11 @@ class GUI(QMainWindow, Ui_MainWindow):
         text_ready.emit('Sta2:Ready')
         return 'Return value of execute_this_fn'    
 
+    def set_reload_model_flag(self):
+        self.reload_model_flag = True
+
+    def set_cuda(self):
+        self.use_cuda = self.GpuSwitch.isChecked()
 
     def startup_update(self):
         if not self.tab_2.isEnabled():
@@ -389,6 +394,11 @@ class GUI(QMainWindow, Ui_MainWindow):
             self.TTSSkipButton.setEnabled(True)
         else:
             self.ClientSkipBtn.setEnabled(True)
+        print(wav.dtype)
+        if wav.dtype != np.int16 :
+            print('\n float32')
+            # Convert from float32 or float16 to signed int16 for pygame
+            wav = (wav/np.amax(wav) * 32767).astype(np.int16)
         sound = pygame.mixer.Sound(wav)
         self.channel.queue(sound)
         # TODO Disable skip btn on playback end
@@ -426,8 +436,6 @@ class GUI(QMainWindow, Ui_MainWindow):
     def start_synthesis(self):
         # Runs in main gui thread. Synthesize blocks gui.
         # Can update gui directly in this function.
-        text = self.TTSTextEdit.toPlainText()
-        text = self.pre_process_str(text)
         self.TTSDialogButton.setDisabled(True)
         self.TTModelCombo.setDisabled(True)
         self.WGModelCombo.setDisabled(True)
@@ -439,6 +447,21 @@ class GUI(QMainWindow, Ui_MainWindow):
         # We use a signal callback here to stick to the same params type in synthesize.py
         if self.reload_model_flag: 
             self.reload_model()
+        
+        # Prepare text input
+        text = self.TTSTextEdit.toPlainText()
+        sequence = np.array(text_to_sequence(text, ['english_cleaners']))[None, :]
+        device = torch.device('cuda' if self.use_cuda else 'cpu')
+        sequence = torch.autograd.Variable(
+            torch.from_numpy(sequence)).to(device).long()
+        # Decode text input
+        mel_outputs, mel_outputs_postnet, _, alignments = self.model.inference(sequence)
+        # Synthesize audio from spectrogram using WaveGlow
+        with torch.no_grad():
+            audio = self.waveglow.infer(mel_outputs_postnet, sigma=0.666)
+        #audio_denoised = denoiser(audio, strength=0.01)[:, 0]
+        #wav = audio_denoised.cpu().numpy()
+        wav = audio[0].data.cpu().numpy()
         self.playback_wav(wav)
         self.update_log_window('Done')
         self.TTSDialogButton.setEnabled(True)
@@ -503,11 +526,6 @@ class GUI(QMainWindow, Ui_MainWindow):
             print(response.text)
         
         return False
-
-    def pre_process_str(self,msg):
-        # Replaces digits with words
-        msg = re.sub(r"(\d+)", lambda x: num2words.num2words(int(x.group(0))), msg)
-        return msg
     
     def get_min_donation(self):
         return float(self.ClientAmountLine.value())

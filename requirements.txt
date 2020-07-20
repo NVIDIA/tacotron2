@@ -1,8 +1,12 @@
 matplotlib
-tensorflow==1.15.2
+requests
 numpy
 inflect
 librosa
 scipy
 Unidecode
 pillow
+pygame
+pyqt5
+numba==0.48
+tqdm

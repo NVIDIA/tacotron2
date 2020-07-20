@@ -1,3 +1,10 @@
+## GUI Work in Progress (update 20 July 2020)
+GUI wrapper for synthesize. Allows CPU-only synthesis via a toggleable switch.
+
+<img src="https://i.imgur.com/3k7kOAb.png" height="450" align="center">
+
+
+
 # Tacotron 2 (without wavenet)
 
 PyTorch implementation of [Natural TTS Synthesis By Conditioning

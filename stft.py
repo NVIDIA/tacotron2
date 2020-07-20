@@ -42,8 +42,9 @@ from audio_processing import window_sumsquare
 class STFT(torch.nn.Module):
     """adapted from Prem Seetharaman's https://github.com/pseeth/pytorch-stft"""
     def __init__(self, filter_length=800, hop_length=200, win_length=800,
-                 window='hann'):
+                 window='hann',use_cuda = True):
         super(STFT, self).__init__()
+        self.device = torch.device('cuda' if use_cuda else 'cpu')
         self.filter_length = filter_length
         self.hop_length = hop_length
         self.win_length = win_length
@@ -89,8 +90,8 @@ class STFT(torch.nn.Module):
         input_data = input_data.squeeze(1)
 
         forward_transform = F.conv1d(
-            input_data,
-            Variable(self.forward_basis, requires_grad=False),
+            input_data.to(self.device),
+            Variable(self.forward_basis, requires_grad=False).to(self.device),
             stride=self.hop_length,
             padding=0)
 
@@ -124,7 +125,7 @@ class STFT(torch.nn.Module):
                 np.where(window_sum > tiny(window_sum))[0])
             window_sum = torch.autograd.Variable(
                 torch.from_numpy(window_sum), requires_grad=False)
-            window_sum = window_sum.cuda() if magnitude.is_cuda else window_sum
+            window_sum = window_sum.to(self.device) if magnitude.is_cuda else window_sum
             inverse_transform[:, :, approx_nonzero_indices] /= window_sum[approx_nonzero_indices]
 
             # scale by hop ratio

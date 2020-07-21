@@ -7,6 +7,7 @@ from nvidia_tacotron_TTS_Layout import Ui_MainWindow
 from switch import Switch
 from timerthread import timerThread
 import traceback
+import textwrap
 
 import time
 import requests
@@ -133,6 +134,9 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.use_cuda = False
         self.GpuSwitch.toggled.connect(self.set_cuda)
 
+        self.progressBar2Label.setText('')
+        self.progressBarLabel.setText('')
+
         self.model = None
         self.waveglow = None
         self.hparams = None
@@ -193,7 +197,8 @@ class GUI(QMainWindow, Ui_MainWindow):
                     'GUI: end of polling loop': self.fns_gui_endpolling ,
                     'Wav: playback' : self.fns_wav_playback,
                     'Var: offset': self.fns_var_offset,
-                    'Var: prev_time': self.fns_var_prevtime,}
+                    'Var: prev_time': self.fns_var_prevtime,
+                    'GUI: progress bar 2 text' : self.fns_gui_pbtext}
 
     def fns_gui_startpolling(self,arg=None):
         'GUI: start of polling loop'
@@ -226,6 +231,10 @@ class GUI(QMainWindow, Ui_MainWindow):
 
     def fns_var_prevtime(self,arg):
         self.prev_time = arg
+
+    def fns_gui_pbtext(self,tup):
+        current,total = tup
+        self.progressBar2Label.setText('{}/{}'.format(current,total))
 
     @pyqtSlot(tuple)
     def on_fncallback(self,tup):
@@ -361,26 +370,33 @@ class GUI(QMainWindow, Ui_MainWindow):
                             name = dono['donation']['user']['username']
                             msg = dono['donation']['message']
                             ## TODO Allow multiple speaker in msg
-                            sequence = np.array(text_to_sequence(msg, ['english_cleaners']))[None, :]
                             currency = dono['donation']['currency']
                             dono_id = dono['_id']
                             text_ready.emit("Log2:\n###########################")
                             text_ready.emit("Log2:"+name+' donated '+currency+str(amount))
                             text_ready.emit("Log2:"+msg)
-                            # Inference
-                            device = torch.device('cuda' if use_cuda else 'cpu')
-                            sequence = torch.autograd.Variable(
-                                torch.from_numpy(sequence)).to(device).long()
-                            # Decode text input
-                            mel_outputs, mel_outputs_postnet, _, alignments = model.inference(sequence)
-                            with torch.no_grad():
-                                audio = waveglow.infer(mel_outputs_postnet, 
-                                                        sigma=0.666,
-                                                        progress_callback = progress_callback,
-                                                        elapsed_callback = None)
-                                wav = audio[0].data.cpu().numpy()
+                            lines = textwrap.wrap(msg, 180, break_long_words=False)
+                            output = []
+                            for count, line in enumerate(lines):
+                                fn_callback.emit(('GUI: progress bar 2 text', (count,len(lines))))
+                                sequence = np.array(text_to_sequence(line, ['english_cleaners']))[None, :]
+                                # Inference
+                                device = torch.device('cuda' if use_cuda else 'cpu')
+                                sequence = torch.autograd.Variable(
+                                    torch.from_numpy(sequence)).to(device).long()
+                                # Decode text input
+                                mel_outputs, mel_outputs_postnet, _, alignments = model.inference(sequence)
+                                with torch.no_grad():
+                                    audio = waveglow.infer(mel_outputs_postnet, 
+                                                            sigma=0.666,
+                                                            progress_callback = progress_callback,
+                                                            elapsed_callback = None)
+                                    wav = audio[0].data.cpu().numpy()
+                                fn_callback.emit(('GUI: progress bar 2 text', (count+1,len(lines))))
+                                output.append(wav)
+                            outwav = np.concatenate(output)
                             # Playback
-                            fn_callback.emit(('Wav: playback',wav))
+                            fn_callback.emit(('Wav: playback',outwav))
                             prev_time = dono_time # Increment time
             time.sleep(0.5)
         fn_callback.emit(('GUI: end of polling loop',None))
@@ -527,8 +543,8 @@ class GUI(QMainWindow, Ui_MainWindow):
             self.reload_model_flag = False
         # Prepare text input
         text = self.TTSTextEdit.toPlainText()
-        sequence = np.array(text_to_sequence(text, ['english_cleaners']))[None, :]
-        self.current_thread = inferThread(sequence,
+        
+        self.current_thread = inferThread(text,
                                         self.use_cuda,
                                         self.model,
                                         self.waveglow, 
@@ -537,7 +553,8 @@ class GUI(QMainWindow, Ui_MainWindow):
                                         self.t_1,
                                         parent = self)
         self.current_thread.audioSignal.connect(self.on_inferThread_audio)
-        self.current_thread.timeElapsed.connect(self.print_elapsed)
+        self.current_thread.timeElapsed.connect(self.on_elapsed)
+        self.current_thread.iterSignal.connect(self.on_itersignal)
 
     @pyqtSlot(np.ndarray)    
     def on_inferThread_audio(self,wav):
@@ -564,6 +581,11 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.update_status_bar("Ready")
         
         # TODO get pygame mixer callback on end or use sounddevice
+    
+    @pyqtSlot(tuple)
+    def on_itersignal(self,tup):
+        current,total = tup
+        self.progressBarLabel.setText('{}/{}'.format(current,total))
 
     def update_log_window_2(self, line, mode="newline"):
         if mode == "newline" or not self.logs2:
@@ -629,11 +651,12 @@ class GUI(QMainWindow, Ui_MainWindow):
 class inferThread(QThread):
     timeElapsed = pyqtSignal(int)
     audioSignal = pyqtSignal(np.ndarray)
+    iterSignal = pyqtSignal(tuple)
 
-    def __init__(self, sequence, use_cuda, model, waveglow, 
+    def __init__(self, text, use_cuda, model, waveglow, 
                 progress, elapsed, timestart, parent=None):
         super(inferThread, self).__init__(parent)
-        self.sequence = sequence
+        self.text = text
         self.use_cuda = use_cuda
         self.model = model
         self.waveglow = waveglow
@@ -646,18 +669,26 @@ class inferThread(QThread):
 
     def run(self):
         self.timerThread.start(time.time())
-        device = torch.device('cuda' if self.use_cuda else 'cpu')
-        self.sequence = torch.autograd.Variable(
-            torch.from_numpy(self.sequence)).to(device).long()
-        # Decode text input
-        mel_outputs, mel_outputs_postnet, _, alignments = self.model.inference(self.sequence)
-        with torch.no_grad():
-            audio = self.waveglow.infer(mel_outputs_postnet, 
-                                    sigma=0.666,
-                                    progress_callback = self.progress,
-                                    elapsed_callback = self.elapsed)
-            wav = audio[0].data.cpu().numpy()
-        self.audioSignal.emit(wav)
+        lines = textwrap.wrap(self.text, 180, break_long_words=False)
+        output  = []
+        for count,line in enumerate(lines):
+            self.iterSignal.emit((count,len(lines)))
+            sequence = np.array(text_to_sequence(line, ['english_cleaners']))[None, :]
+            device = torch.device('cuda' if self.use_cuda else 'cpu')
+            sequence = torch.autograd.Variable(
+                torch.from_numpy(sequence)).to(device).long()
+            # Decode text input
+            mel_outputs, mel_outputs_postnet, _, alignments = self.model.inference(sequence)
+            with torch.no_grad():
+                audio = self.waveglow.infer(mel_outputs_postnet, 
+                                        sigma=0.666,
+                                        progress_callback = self.progress,
+                                        elapsed_callback = self.elapsed)
+                wav = audio[0].data.cpu().numpy()
+            self.iterSignal.emit((count+1,len(lines)))
+            output.append(wav)
+        outwav = np.concatenate(output)
+        self.audioSignal.emit(outwav)
         
 
 if __name__ == '__main__':

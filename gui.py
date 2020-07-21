@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QWidget,QMainWindow,QHeaderView, QMessageBox, QFileD
 from nvidia_tacotron_TTS_Layout import Ui_MainWindow
 from switch import Switch
 from timerthread import timerThread
+import traceback
 
 import time
 import requests
@@ -33,6 +34,7 @@ from train import load_model
 from text import text_to_sequence
 from denoiser import Denoiser
 
+#from secrets import TOKEN
 
 _mutex1 = QMutex()
 _running = False
@@ -64,6 +66,7 @@ class WorkerSignals(QObject):
     result = pyqtSignal(object)
     progress = pyqtSignal(int)
     elapsed = pyqtSignal(int)
+    fncallback = pyqtSignal(tuple) 
 
 class Worker(QRunnable):
     '''
@@ -92,6 +95,7 @@ class Worker(QRunnable):
         self.kwargs['progress_callback'] = self.signals.progress        
         self.kwargs['elapsed_callback'] = self.signals.elapsed
         self.kwargs['text_ready'] = self.signals.textready
+        self.kwargs['fn_callback'] = self.signals.fncallback
 
     @pyqtSlot()
     def run(self):
@@ -182,11 +186,54 @@ class GUI(QMainWindow, Ui_MainWindow):
         print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
         self.signals = GUISignals()  
         self.signals.progress.connect(self.update_log_bar)
-        self.signals.elapsed.connect(self.print_elapsed)
+        self.signals.elapsed.connect(self.on_elapsed)
 
-    
+        # Callback functions
+        self.fns = {'GUI: start of polling loop': self.fns_gui_startpolling, 
+                    'GUI: end of polling loop': self.fns_gui_endpolling ,
+                    'Wav: playback' : self.fns_wav_playback,
+                    'Var: offset': self.fns_var_offset,
+                    'Var: prev_time': self.fns_var_prevtime,}
+
+    def fns_gui_startpolling(self,arg=None):
+        'GUI: start of polling loop'
+        self.ClientStartBtn.setDisabled(True)
+        self.ClientStopBtn.setEnabled(True)
+        self.ClientSkipBtn.setEnabled(True)
+        self.tab.setDisabled(True)
+        self.ClientAmountLine.setDisabled(True)
+
+    def fns_gui_endpolling(self,arg=None):
+        self.ClientStartBtn.setEnabled(True)
+        self.ClientStopBtn.setDisabled(True)
+        self.ClientSkipBtn.setDisabled(True)
+        self.tab.setEnabled(True)
+        self.ClientAmountLine.setEnabled(True)
+        
+    def fns_wav_playback(self,wav):
+        if self.tabWidget.currentIndex()==0:
+            self.TTSSkipButton.setEnabled(True)
+        else:
+            self.ClientSkipBtn.setEnabled(True)
+        if wav.dtype != np.int16 :
+            # Convert from float32 or float16 to signed int16 for pygame
+            wav = (wav/np.amax(wav) * 32767).astype(np.int16)
+        sound = pygame.mixer.Sound(wav)
+        self.channel.queue(sound)
+
+    def fns_var_offset(self,arg):
+        self.offset = arg
+
+    def fns_var_prevtime(self,arg):
+        self.prev_time = arg
+
+    @pyqtSlot(tuple)
+    def on_fncallback(self,tup):
+        option,arg = tup
+        self.fns[option](arg)
+
     @pyqtSlot(str)
-    def draw_text(self,text):
+    def on_textready(self,text):
         # Function to send text from client thread to GUI thread
         # Format of text: <Obj>:<Message>
         obj = text[0:4]
@@ -219,18 +266,18 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.progressBar2.setTextVisible(val != 0)
 
     @pyqtSlot(int)
-    def print_elapsed(self,val):
+    def on_elapsed(self,val):
         if self.tabWidget.currentIndex()==0:
             self.update_log_window('Elapsed: '+str(val)+'s',mode='overwrite') 
         else:
             pass # No elapsed time for tab2 
     
 
-    def thread_complete(self):
+    def on_finished(self):
         #print("THREAD COMPLETE!")
         pass
 
-    def print_output(self, s):
+    def on_result(self, s):
         #print(s)
         pass
 
@@ -239,16 +286,25 @@ class GUI(QMainWindow, Ui_MainWindow):
         global _running
         if not self.validate_se():
             return
+        if self.reload_model_flag: 
+            self.reload_model()  
+            self.reload_model_flag = False
+        min_donation = self.get_min_donation()
+        TOKEN = self.get_token()
         _mutex1.lock()
         _running = True
         _mutex1.unlock()
-        worker = Worker(self.execute_this_fn, self.channel) # Any other args, kwargs are passed to the run function
-        worker.signals.result.connect(self.print_output)
-        worker.signals.finished.connect(self.thread_complete)
+        worker = Worker(self.execute_this_fn, TOKEN, min_donation, self.channel,
+                    self.use_cuda, self.model, self.waveglow, 
+                    self.offset, self.prev_time, self.startup_time) 
+                    # Any other args, kwargs are passed to the run function
+        worker.signals.result.connect(self.on_result)
+        worker.signals.finished.connect(self.on_finished)
         worker.signals.progress.connect(self.update_log_bar2)
-        worker.signals.textready.connect(self.draw_text)
-        worker.signals.elapsed.connect(self.print_elapsed)
-        
+        worker.signals.textready.connect(self.on_textready)
+        worker.signals.elapsed.connect(self.on_elapsed)
+        worker.signals.fncallback.connect(self.on_fncallback)
+
         # Execute
         self.threadpool.start(worker) 
         
@@ -262,26 +318,21 @@ class GUI(QMainWindow, Ui_MainWindow):
     # def progress_fn(self, n):
     #     print("%d%% done" % n)
     
-    def execute_this_fn(self, channel, progress_callback, elapsed_callback, text_ready):
+    def execute_this_fn(self, TOKEN, min_donation, channel, 
+                    use_cuda, model, waveglow,
+                    offset, prev_time, startup_time,
+                    progress_callback, elapsed_callback, text_ready, fn_callback):
         # Function executes in client thread. 
         # Synthesis does not block gui thread.
         # Can run methods of GUI class but cannot run GUI updates directly
         # from this thread. Use signal and slots to communicate with main GUI.
         # We pass pygame.mixer.channel object into this thread to check for channel activity.
-        self.ClientStartBtn.setDisabled(True)
-        self.ClientStopBtn.setEnabled(True)
-        self.ClientSkipBtn.setEnabled(True)
-        self.tab.setDisabled(True)
-        self.ClientAmountLine.setDisabled(True)
+        fn_callback.emit(('GUI: start of polling loop',None))
         text_ready.emit("Sta2:Connecting to StreamElements")
         url = "https://api.streamelements.com/kappa/v2/tips/"+self.channel_id
-        headers = {'accept': 'application/json',"Authorization": "Bearer "+self.get_token()}
-        text_ready.emit('Log2:Using TTS Voice: '+self.model_selected)
+        headers = {'accept': 'application/json',"Authorization": "Bearer "+TOKEN}
         text_ready.emit('Log2:Initializing')
-        min_donation = self.get_min_donation()
         text_ready.emit('Log2:Minimum amount for TTS: '+str(min_donation))
-        graph = Graph(mode="synthesize")
-        model_fpath = self.get_current_model_dir()
         while True:
             _mutex1.lock()
             if _running == False:
@@ -293,37 +344,51 @@ class GUI(QMainWindow, Ui_MainWindow):
                 #print('Polling', datetime.datetime.utcnow().isoformat())
                 text_ready.emit("Sta2:Waiting for incoming donations . . .")
                 current_time = datetime.datetime.utcnow().isoformat()
-                querystring = {"offset":self.offset,"limit":"1","sort":"createdAt","after":self.startup_time,"before":current_time}
+                querystring = {"offset":offset,
+                                "limit":"1",
+                                "sort":"createdAt",
+                                "after":startup_time,
+                                "before":current_time}
                 response = requests.request("GET", url, headers=headers, params=querystring)
                 data = json.loads(response.text)
                 for dono in data['docs']:
                     text_ready.emit("Sta2:Processing donations")
                     dono_time = dono['createdAt']
-                    self.offset += 1
-                    if dono_time > self.prev_time: # Str comparison
+                    offset += 1
+                    if dono_time > prev_time: # Str comparison
                         amount = dono['donation']['amount'] # Int
                         if float(amount) >= min_donation: # Float comparison
                             name = dono['donation']['user']['username']
                             msg = dono['donation']['message']
                             ## TODO Allow multiple speaker in msg
-                            msg = self.pre_process_str(msg)
+                            sequence = np.array(text_to_sequence(msg, ['english_cleaners']))[None, :]
                             currency = dono['donation']['currency']
                             dono_id = dono['_id']
                             text_ready.emit("Log2:\n###########################")
                             text_ready.emit("Log2:"+name+' donated '+currency+str(amount))
                             text_ready.emit("Log2:"+msg)
-                            wav=synthesize.synthesize(msg, model_fpath, graph, progress_callback, elapsed_callback)
-                            self.playback_wav(wav)
-                            self.prev_time = dono_time # Increment time
+                            # Inference
+                            device = torch.device('cuda' if use_cuda else 'cpu')
+                            sequence = torch.autograd.Variable(
+                                torch.from_numpy(sequence)).to(device).long()
+                            # Decode text input
+                            mel_outputs, mel_outputs_postnet, _, alignments = model.inference(sequence)
+                            with torch.no_grad():
+                                audio = waveglow.infer(mel_outputs_postnet, 
+                                                        sigma=0.666,
+                                                        progress_callback = progress_callback,
+                                                        elapsed_callback = None)
+                                wav = audio[0].data.cpu().numpy()
+                            # Playback
+                            fn_callback.emit(('Wav: playback',wav))
+                            prev_time = dono_time # Increment time
             time.sleep(0.5)
-        self.ClientStartBtn.setEnabled(True)
-        self.ClientStopBtn.setDisabled(True)
-        self.ClientSkipBtn.setDisabled(True)
-        self.tab.setEnabled(True)
-        self.ClientAmountLine.setEnabled(True)
+        fn_callback.emit(('GUI: end of polling loop',None))
         text_ready.emit('Log2:\nDisconnected')
         text_ready.emit('Sta2:Ready')
-        return 'Return value of execute_this_fn'    
+        fn_callback.emit(('Var: offset', offset))
+        fn_callback.emit(('Var: prev_time', prev_time))
+        return #'Return value of execute_this_fn'    
 
     def set_reload_model_flag(self):
         self.reload_model_flag = True
@@ -377,6 +442,12 @@ class GUI(QMainWindow, Ui_MainWindow):
 
     def get_current_WGmodel_dir(self):
         return self.WGmodel_dir[self.WGModelCombo.currentIndex()]
+    
+    def get_current_TTmodel_fname(self):
+        return self.TTModelCombo.currentText()
+
+    def get_current_WGmodel_fname(self):
+        return self.WGModelCombo.currentText()
 
     def update_log_window(self, line, mode="newline"):
         if mode == "newline" or not self.logs:
@@ -516,6 +587,9 @@ class GUI(QMainWindow, Ui_MainWindow):
     def get_token(self):
         TOKEN = ''.join(self.APIKeyLine.text().split())
         return TOKEN
+        #tokenobj = TOKEN()
+        #return tokenobj.token
+        
 
     def set_client_flag(self,val):
         self.client_flag = val

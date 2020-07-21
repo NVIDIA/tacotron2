@@ -5,7 +5,7 @@ Also plays TTS donations alerts from Stream Elements.
 
 Main UI | Stream Elements integration
 ------------ | -------------
-<img src="https://i.imgur.com/xeT74vJ.png" height="450" align="left">|<img src="https://i.imgur.com/tjC2q6j.png" height="450" align="left">
+<img src="https://i.imgur.com/xeT74vJ.png" height="430" align="left">|<img src="https://i.imgur.com/tjC2q6j.png" height="430" align="left">
 
 # Tacotron 2 (without wavenet)
 

@@ -1,11 +1,11 @@
-## GUI Work in Progress (update 20 July 2020)
+## GUI Work in Progress (update 21 July 2020)
 GUI wrapper for synthesize. Allows CPU-only synthesis via a toggleable switch. 
 
 Also plays TTS donations alerts from Stream Elements.
 
-<img src="https://i.imgur.com/xeT74vJ.png" height="450" align="left">
-
-<img src="https://i.imgur.com/tjC2q6j.png" height="450" align="right">
+Main UI | Stream Elements integration
+------------ | -------------
+<img src="https://i.imgur.com/xeT74vJ.png" height="450" align="left">|<img src="https://i.imgur.com/tjC2q6j.png" height="450" align="left">
 
 # Tacotron 2 (without wavenet)
 

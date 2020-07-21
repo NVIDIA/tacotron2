@@ -19,7 +19,6 @@ import pygame
 
 import matplotlib
 import matplotlib.pyplot as plt
-import IPython.display as ipd
 
 import sys
 sys.path.append(os.path.join(sys.path[0],'waveglow/'))
@@ -130,9 +129,10 @@ class GUI(QMainWindow, Ui_MainWindow):
         
         self.GpuSwitch = Switch(thumb_radius=8, track_radius=10, show_text = False)
         self.horizontalLayout.addWidget(self.GpuSwitch)
-        self.GpuSwitch.setEnabled = torch.cuda.is_available()
+        self.GpuSwitch.setEnabled(torch.cuda.is_available())
         self.use_cuda = False
         self.GpuSwitch.toggled.connect(self.set_cuda)
+        self.GpuSwitch.setToolTip("<h4>CUDA installed: {}</h4>".format(torch.cuda.is_available()))        # < +++++
 
         self.progressBar2Label.setText('')
         self.progressBarLabel.setText('')
@@ -507,7 +507,8 @@ class GUI(QMainWindow, Ui_MainWindow):
         self.hparams.sampling_rate = 22050
         # Load Tacotron 2 from checkpoint
         self.model = load_model(self.hparams,self.use_cuda)
-        self.model.load_state_dict(torch.load(TTmodel_fpath)['state_dict'])
+        device = torch.device('cuda' if self.use_cuda else 'cpu')
+        self.model.load_state_dict(torch.load(TTmodel_fpath, map_location = device)['state_dict'])
         if self.use_cuda:
             _ = self.model.cuda().eval().half()
         else:

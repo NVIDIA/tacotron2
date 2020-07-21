@@ -1,7 +1,10 @@
 ## GUI Work in Progress (update 21 July 2020)
-GUI wrapper for synthesize. Allows CPU-only synthesis via a toggleable switch. 
+GUI wrapper for synthesize. Allows CPU-only synthesis via a toggleable switch. Portable exe file is available (that runs on CPU only).
 
 Also plays TTS donations alerts from Stream Elements.
+
+## Download Link
+A portable executable can be found at the [Releases](https://github.com/lokkelvin2/dc_tts_GUI/releases) page, or directly [here](https://github.com/lokkelvin2/tacotron2_GUI/releases/download/v0.1/nvidia_waveglow-v0.1_x86_64.exe). Download a pretrained *Tacotron 2* and *Waveglow* model from below.
 
 Main UI | Stream Elements integration
 ------------ | -------------

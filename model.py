@@ -301,7 +301,7 @@ class Decoder(nn.Module):
         """
         # (B, n_mel_channels, T_out) -> (B, T_out, n_mel_channels)
         decoder_inputs = decoder_inputs.transpose(1, 2)
-        decoder_inputs = decoder_inputs.view(
+        decoder_inputs = decoder_inputs.reshape(
             decoder_inputs.size(0),
             int(decoder_inputs.size(1)/self.n_frames_per_step), -1)
         # (B, T_out, n_mel_channels) -> (T_out, B, n_mel_channels)
@@ -312,21 +312,22 @@ class Decoder(nn.Module):
         """ Prepares decoder outputs for output
         PARAMS
         ------
-        mel_outputs:
+        mel_outputs:  list of outputs[batch_size, n_mel_channels*n_frames_per_step] at each step of decoder
         gate_outputs: gate output energies
-        alignments:
+        alignments:   list of alignments at each step of decoder
 
         RETURNS
         -------
-        mel_outputs:
-        gate_outpust: gate output energies
-        alignments:
+        mel_outputs: batched tensor of outputs 
+        gate_outputs: gate output energies
+        alignments: batched tensor of alignments
         """
         # (T_out, B) -> (B, T_out)
         alignments = torch.stack(alignments).transpose(0, 1)
         # (T_out, B) -> (B, T_out)
         gate_outputs = torch.stack(gate_outputs).transpose(0, 1)
         gate_outputs = gate_outputs.contiguous()
+        gate_outputs = gate_outputs.repeat_interleave(self.n_frames_per_step,1)
         # (T_out, B, n_mel_channels) -> (B, T_out, n_mel_channels)
         mel_outputs = torch.stack(mel_outputs).transpose(0, 1).contiguous()
         # decouple frames per step
@@ -442,7 +443,7 @@ class Decoder(nn.Module):
 
             if torch.sigmoid(gate_output.data) > self.gate_threshold:
                 break
-            elif len(mel_outputs) == self.max_decoder_steps:
+            elif len(mel_outputs)*self.n_frames_per_step >= self.max_decoder_steps:
                 print("Warning! Reached max decoder steps")
                 break
 
@@ -488,6 +489,9 @@ class Tacotron2(nn.Module):
         if self.mask_padding and output_lengths is not None:
             mask = ~get_mask_from_lengths(output_lengths)
             mask = mask.expand(self.n_mel_channels, mask.size(0), mask.size(1))
+            if mask.size(2)%self.n_frames_per_step != 0 :
+                to_append = torch.ones( mask.size(0), mask.size(1), (self.n_frames_per_step-mask.size(2)%self.n_frames_per_step) ).bool().to(mask.device)
+                mask = torch.cat([mask, to_append], dim=-1)
             mask = mask.permute(1, 0, 2)
 
             outputs[0].data.masked_fill_(mask, 0.0)

@@ -53,7 +53,7 @@ def create_hparams(hparams_string=None, verbose=False):
         encoder_embedding_dim=512,
 
         # Decoder parameters
-        n_frames_per_step=1,  # currently only 1 is supported
+        n_frames_per_step=1,  # more than 1 is supported now
         decoder_rnn_dim=1024,
         prenet_dim=256,
         max_decoder_steps=1000,

@@ -14,7 +14,7 @@ from model import Tacotron2
 from data_utils import TextMelLoader, TextMelCollate
 from loss_function import Tacotron2Loss
 from logger import Tacotron2Logger
-from hparams import create_hparams
+from config.hparams import HParam
 
 
 def reduce_tensor(tensor, n_gpus):
@@ -272,10 +272,12 @@ if __name__ == '__main__':
     parser.add_argument('--group_name', type=str, default='group_name',
                         required=False, help='Distributed group name')
     parser.add_argument('--hparams', type=str,
-                        required=False, help='comma separated name=value pairs')
+                        required=True, help='path to the yaml config file ')
 
     args = parser.parse_args()
-    hparams = create_hparams(args.hparams)
+    hparams = HParam(args.hparams)
+    with open(args.hparams, "r") as f:
+        hp_str = "".join(f.readlines())
 
     torch.backends.cudnn.enabled = hparams.cudnn_enabled
     torch.backends.cudnn.benchmark = hparams.cudnn_benchmark

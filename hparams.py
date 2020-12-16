@@ -1,11 +1,39 @@
 import tensorflow as tf
 from text import symbols
 
+class HParams(object):
+    hparamdict = []
+    def __init__(self, **hparams):
+        self.hparamdict = hparams
+        for k, v in hparams.items():
+            setattr(self, k, v)
+    def __repr__(self):
+        return "HParams(" + repr([(k, v) for k, v in self.hparamdict.items()]) + ")"
+    def __str__(self):
+        return ','.join([(k + '=' + str(v)) for k, v in self.hparamdict.items()])
+    def parse(self, params):
+        for s in params.split(","):
+            k, v = s.split("=", 1)
+            k = k.strip()
+            t = type(self.hparamdict[k])
+            if t == bool:
+                v = v.strip().lower()
+                if v in ['true', '1']:
+                    v = True
+                elif v in ['false', '0']:
+                    v = False
+                else:
+                    raise ValueError(v)
+            else:
+                v = t(v)
+            self.hparamdict[k] = v
+            setattr(self, k, v)
+        return self
 
 def create_hparams(hparams_string=None, verbose=False):
     """Create model hyperparameters. Parse nondefault from given string."""
 
-    hparams = tf.contrib.training.HParams(
+    hparams = HParams(
         ################################
         # Experiment Parameters        #
         ################################
@@ -86,10 +114,10 @@ def create_hparams(hparams_string=None, verbose=False):
     )
 
     if hparams_string:
-        tf.logging.info('Parsing command line hparams: %s', hparams_string)
+        tf.compat.v1.logging.info('Parsing command line hparams: %s', hparams_string)
         hparams.parse(hparams_string)
 
     if verbose:
-        tf.logging.info('Final parsed hparams: %s', hparams.values())
+        tf.compat.v1.logging.info('Final parsed hparams: %s', hparams.values())
 
     return hparams

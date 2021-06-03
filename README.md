@@ -1,5 +1,5 @@
-# Tacotron 2 (without wavenet)
 Credit by https://github.com/NVIDIA/tacotron2
+# Tacotron 2 (without wavenet)
 
 PyTorch implementation of [Natural TTS Synthesis By Conditioning
 Wavenet On Mel Spectrogram Predictions](https://arxiv.org/pdf/1712.05884.pdf). 

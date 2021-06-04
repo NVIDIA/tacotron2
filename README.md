@@ -1,3 +1,8 @@
+# Thai Text to Speech by Tacotron2
+This repository is the implementation of Tacotron2 using Thai Dataset (Thai TTS)
+and uses the [Tsync2 Nun](https://aiforthai.in.th/corpus.php) dataset by AI FOR THAI
+
+Credit by [NVIDIA/tacotron2](https://github.com/NVIDIA/tacotron2).
 # Tacotron 2 (without wavenet)
 
 PyTorch implementation of [Natural TTS Synthesis By Conditioning

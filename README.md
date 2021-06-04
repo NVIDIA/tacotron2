@@ -1,5 +1,5 @@
 # Thai Text to Speech by Tacotron2
-This Repository is the implementation of Tacotron2 Thai TTS 
+This repository is the implementation of Tacotron2 using Thai Dataset (Thai TTS)
 and uses the [Tsync2 Nun](https://aiforthai.in.th/corpus.php) dataset by AI FOR THAI
 
 Credit by [NVIDIA/tacotron2](https://github.com/NVIDIA/tacotron2).

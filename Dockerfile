@@ -11,3 +11,5 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 RUN pip install jupyter
+
+RUN pip install apex==0.9.10.dev0

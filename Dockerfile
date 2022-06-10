@@ -1,10 +1,13 @@
-FROM pytorch/pytorch:nightly-devel-cuda10.0-cudnn7
-ENV PATH /usr/local/nvidia/bin:/usr/local/cuda/bin:${PATH}
+FROM python:3.7
 
 RUN apt-get update -y
 
-RUN pip install numpy scipy matplotlib librosa==0.6.0 tensorflow tensorboardX inflect==0.2.5 Unidecode==1.0.22 pillow jupyter
+RUN pip install --upgrade pip
 
-ADD apex /apex/
-WORKDIR /apex/
-RUN pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" .
+RUN pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
+
+COPY requirements.txt .
+
+RUN pip install -r requirements.txt
+
+RUN pip install jupyter

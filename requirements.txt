@@ -1,8 +1,8 @@
-matplotlib==2.1.0
+matplotlib
 tensorflow==1.15.2
-numpy==1.13.3
+numpy==1.19.4
 inflect==0.2.5
 librosa==0.6.0
-scipy==1.0.0
+scipy==1.5.4
 Unidecode==1.0.22
 pillow
